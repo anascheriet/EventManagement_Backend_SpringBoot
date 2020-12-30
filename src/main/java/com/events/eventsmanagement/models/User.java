@@ -27,7 +27,8 @@ public class User {
     private String displayName;
     private String email;
     private String gender;
-    private String Nationality;
+    private String nationality;
+    private String role;
     private int age;
 
 
@@ -36,6 +37,7 @@ public class User {
     private List<Event> events = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Reservation> reservations = new ArrayList<>();
 
 

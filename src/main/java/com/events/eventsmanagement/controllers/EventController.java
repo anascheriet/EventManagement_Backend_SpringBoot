@@ -29,7 +29,6 @@ public class EventController {
     @Autowired
     private EventTypeRepository eventTypeRepository;
 
-
     @PostMapping("/create")
     public ResponseEntity<eventDto> addEvent(@RequestBody eventDto eventDto) {
         var user = userRepository.findById(eventDto.getUserid());
@@ -60,10 +59,20 @@ public class EventController {
     @GetMapping("/{id}")
     public ResponseEntity<eventGetDto> getEventById(@PathVariable int id) {
         var event = eventRepository.findById(id);
-
         var returnedEvent = new eventGetDto(event.get(), event.get().getUser().getId(), event.get().getUser().getDisplayName());
-
         return ResponseEntity.ok(returnedEvent);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<eventDto> patchEvent(@PathVariable int id, @RequestBody eventDto req) {
+        var foundEvent = eventRepository.findById(id);
+        foundEvent.map(ev -> {
+            ev.setEventDate(req.getEventDate());
+            ev.setEventName(req.getEventName());
+            return ResponseEntity.ok(eventRepository.save(ev));
+        }).orElse(null);
+
+        return ResponseEntity.ok(req);
     }
 
 }

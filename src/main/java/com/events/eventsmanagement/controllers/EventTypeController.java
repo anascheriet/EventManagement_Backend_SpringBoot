@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lombok.var;
+
 @RestController
 @RequestMapping("eventTypes")
 public class EventTypeController {
@@ -20,9 +21,15 @@ public class EventTypeController {
     }
 
     @GetMapping("/")
-    public Iterable<EventType> getEventTypes ()
-    {
+    public Iterable<EventType> getEventTypes() {
         return eventTypeRepository.findAll();
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<EventType> updateEvType(@PathVariable int id, @RequestBody EventType req){
+        var foundType = eventTypeRepository.findById(id);
+        req.setId(foundType.get().getId());
+        return ResponseEntity.ok( eventTypeRepository.save(req));
     }
 
 }

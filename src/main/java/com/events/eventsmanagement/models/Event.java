@@ -30,7 +30,6 @@ public class Event {
     @CreatedDate
     private Date createdAt;
 
-
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     @JsonBackReference
@@ -39,9 +38,6 @@ public class Event {
     @OneToOne
     @JoinColumn(name = "eventtype_id", referencedColumnName = "id")
     private EventType eventType;
-
-
-
 
     public Event(String eventName, Date eventDate, User user, EventType eventType) {
         this.createdAt = new Date();

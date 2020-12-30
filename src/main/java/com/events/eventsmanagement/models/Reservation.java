@@ -1,5 +1,6 @@
 package com.events.eventsmanagement.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,7 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     public Reservation(Date reservationDate, int numOfPeople, User user)

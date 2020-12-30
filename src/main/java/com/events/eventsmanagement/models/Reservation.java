@@ -25,10 +25,9 @@ public class Reservation {
     @CreatedDate
     private Date bookedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id")
     private User user;
-
 
     public Reservation(Date reservationDate, int numOfPeople, User user)
     {

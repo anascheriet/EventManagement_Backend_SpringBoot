@@ -2,20 +2,27 @@ package com.events.eventsmanagement.controllers;
 
 import com.events.eventsmanagement.models.User;
 import com.events.eventsmanagement.repositories.UserRepository;
+import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import sun.jvm.hotspot.debugger.Page;
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/users")
 public class UserController {
     @Autowired
     private UserRepository userRepository;
 
     @PostMapping("/register")
-    public User Register(@RequestBody User user) {
-        return userRepository.save(user);
+    public ResponseEntity<User> Register(@RequestBody User user) {
+        User createdUser = userRepository.save(user);
+        return ResponseEntity.ok(createdUser);
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<Iterable<User>> getAllUsers(){
+        var users = userRepository.findAll();
+        return ResponseEntity.ok(users);
     }
 }

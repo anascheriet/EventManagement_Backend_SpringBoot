@@ -5,6 +5,7 @@ import com.events.eventsmanagement.models.Reservation;
 import com.events.eventsmanagement.repositories.EventTypeRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,7 +16,7 @@ import lombok.var;
 import com.events.eventsmanagement.repositories.ReservationRepository;
 
 @RestController
-@RequestMapping("reservation")
+@RequestMapping("reservations")
 public class ReservationController {
 
     @Autowired
@@ -24,13 +25,15 @@ public class ReservationController {
     private UserRepository userRepository;
 
     @PostMapping("/create")
-    public String addReservation(@RequestBody reservationDto reservationDto) {
+    public ResponseEntity<reservationDto> addReservation(@RequestBody reservationDto reservationDto) {
         var user = userRepository.findById(reservationDto.getUserid());
 
-        if (user.isPresent()) {
-            Reservation res = new Reservation(reservationDto.getReservationDate(), reservationDto.getNumOfPeople(), user.get());
-            reservationRepository.save(res);
+        if (!user.isPresent()) {
+            return ResponseEntity.unprocessableEntity().build();
         }
-        return "";
+
+        Reservation res = new Reservation(reservationDto.getReservationDate(), reservationDto.getNumOfPeople(), user.get());
+        reservationRepository.save(res);
+        return ResponseEntity.ok(reservationDto);
     }
 }

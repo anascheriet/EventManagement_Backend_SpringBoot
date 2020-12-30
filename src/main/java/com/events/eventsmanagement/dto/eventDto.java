@@ -1,8 +1,6 @@
 package com.events.eventsmanagement.dto;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
 
 import java.util.Date;
 

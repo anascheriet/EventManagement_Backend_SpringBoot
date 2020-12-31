@@ -34,11 +34,11 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<Event> events = new ArrayList<>();
+    private List<Event> createdEvents = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<Reservation> reservations = new ArrayList<>();
+    private List<Reservation> bookedReservations = new ArrayList<>();
 
 
 }

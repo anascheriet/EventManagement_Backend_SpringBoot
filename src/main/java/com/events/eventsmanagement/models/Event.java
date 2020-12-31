@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Entity
@@ -38,6 +40,10 @@ public class Event {
     @OneToOne
     @JoinColumn(name = "eventtype_id", referencedColumnName = "id")
     private EventType eventType;
+
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<Reservation> ClientReservations = new ArrayList<>();
 
     public Event(String eventName, Date eventDate, User user, EventType eventType) {
         this.createdAt = new Date();

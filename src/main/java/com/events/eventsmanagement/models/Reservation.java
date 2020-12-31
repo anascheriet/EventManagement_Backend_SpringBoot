@@ -31,12 +31,19 @@ public class Reservation {
     @JsonBackReference
     private User user;
 
-    public Reservation(Date reservationDate, int numOfPeople, User user)
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "event_id")
+    @JsonBackReference
+    private Event event;
+
+    public Reservation(Date reservationDate, int numOfPeople, User user, Event event)
     {
         this.bookedAt = new Date();
         this.reservationDate = reservationDate;
         this.numOfPeople = numOfPeople;
         this.user = user;
+        this.event = event;
     }
 
 }

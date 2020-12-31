@@ -10,4 +10,5 @@ public class reservationDto {
     private Date reservationDate;
     private int numOfPeople;
     private int userid;
+    private int eventid;
 }

@@ -33,9 +33,9 @@ public class Event {
     private Date createdAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
-    @JsonBackReference
-    private User user;
+    @JoinColumn(name = "appuser_id")
+    @JsonBackReference(value="user-events")
+    private AppUser appUser;
 
     @OneToOne
     @JoinColumn(name = "eventtype_id", referencedColumnName = "id")
@@ -45,11 +45,11 @@ public class Event {
     @JsonManagedReference
     private List<Reservation> ClientReservations = new ArrayList<>();
 
-    public Event(String eventName, Date eventDate, User user, EventType eventType) {
+    public Event(String eventName, Date eventDate, AppUser appUser, EventType eventType) {
         this.createdAt = new Date();
         this.eventName = eventName;
         this.eventDate = eventDate;
-        this.user = user;
+        this.appUser = appUser;
         this.eventType = eventType;
     }
 }

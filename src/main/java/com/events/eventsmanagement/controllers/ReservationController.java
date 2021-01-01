@@ -3,7 +3,6 @@ package com.events.eventsmanagement.controllers;
 import com.events.eventsmanagement.dto.reservationDto;
 import com.events.eventsmanagement.models.Reservation;
 import com.events.eventsmanagement.repositories.EventRepository;
-import com.events.eventsmanagement.repositories.EventTypeRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -51,8 +50,8 @@ public class ReservationController {
             var oneRes = reservationRepository.findById(res.getId());
             var resDto = new reservationGetDto();
             resDto.setReservation(oneRes.get());
-            resDto.setClientId(oneRes.get().getUser().getId());
-            resDto.setClientName(oneRes.get().getUser().getDisplayName());
+            resDto.setClientId(oneRes.get().getAppUser().getId());
+            resDto.setClientName(oneRes.get().getAppUser().getDisplayName());
             resDto.setEventId(oneRes.get().getEvent().getId());
             resDto.setEventName(oneRes.get().getEvent().getEventName());
 
@@ -72,12 +71,28 @@ public class ReservationController {
         var resDto = new reservationGetDto();
 
         resDto.setReservation(oneRes.get());
-        resDto.setClientId(oneRes.get().getUser().getId());
-        resDto.setClientName(oneRes.get().getUser().getDisplayName());
+        resDto.setClientId(oneRes.get().getAppUser().getId());
+        resDto.setClientName(oneRes.get().getAppUser().getDisplayName());
         resDto.setEventId(oneRes.get().getEvent().getId());
         resDto.setEventName(oneRes.get().getEvent().getEventName());
 
         return ResponseEntity.ok(resDto);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<reservationDto> updateReservation(@RequestBody reservationDto req, @PathVariable int id) {
+        var foundRes = reservationRepository.findById(id);
+        if (!foundRes.isPresent()) {
+            return ResponseEntity.unprocessableEntity().build();
+        }
+
+        foundRes.map(res -> {
+            res.setNumOfPeople(req.getNumOfPeople());
+            res.setReservationDate(req.getReservationDate());
+            return ResponseEntity.ok(reservationRepository.save(res));
+        }).orElseGet(null);
+
+        return ResponseEntity.ok(req);
     }
 
 

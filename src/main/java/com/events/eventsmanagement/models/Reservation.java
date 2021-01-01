@@ -27,9 +27,9 @@ public class Reservation {
     private Date bookedAt;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "user_id")
-    @JsonBackReference
-    private User user;
+    @JoinColumn(name = "appuser_id")
+    @JsonBackReference(value="user-bookings")
+    private AppUser appUser;
 
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -37,12 +37,12 @@ public class Reservation {
     @JsonBackReference
     private Event event;
 
-    public Reservation(Date reservationDate, int numOfPeople, User user, Event event)
+    public Reservation(Date reservationDate, int numOfPeople, AppUser appUser, Event event)
     {
         this.bookedAt = new Date();
         this.reservationDate = reservationDate;
         this.numOfPeople = numOfPeople;
-        this.user = user;
+        this.appUser = appUser;
         this.event = event;
     }
 

@@ -6,6 +6,7 @@ import com.events.eventsmanagement.repositories.EventTypeRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
 import com.events.eventsmanagement.dto.eventDto;
 import com.events.eventsmanagement.dto.eventGetDto;
+import com.events.eventsmanagement.security.UserService;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 
 @RestController
@@ -28,6 +28,8 @@ public class EventController {
 
     @Autowired
     private EventTypeRepository eventTypeRepository;
+
+
 
     @PostMapping("/create")
     public ResponseEntity<eventDto> addEvent(@RequestBody eventDto eventDto) {
@@ -50,7 +52,7 @@ public class EventController {
 
         events.forEach(ev -> {
             var event = eventRepository.findById(ev.getId());
-            var returnedEvent = new eventGetDto(ev, ev.getUser().getId(), ev.getUser().getDisplayName());
+            var returnedEvent = new eventGetDto(ev, ev.getAppUser().getId(), ev.getAppUser().getDisplayName());
             returnedEvents.add(returnedEvent);
         });
         return ResponseEntity.ok(returnedEvents);
@@ -59,7 +61,7 @@ public class EventController {
     @GetMapping("/{id}")
     public ResponseEntity<eventGetDto> getEventById(@PathVariable int id) {
         var event = eventRepository.findById(id);
-        var returnedEvent = new eventGetDto(event.get(), event.get().getUser().getId(), event.get().getUser().getDisplayName());
+        var returnedEvent = new eventGetDto(event.get(), event.get().getAppUser().getId(), event.get().getAppUser().getDisplayName());
         return ResponseEntity.ok(returnedEvent);
     }
 

@@ -43,7 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/")
-    public JwtResponse LogIn(@RequestBody loginDto loginRequest) {
+    public ResponseEntity<JwtResponse> LogIn(@RequestBody loginDto loginRequest) {
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -53,7 +53,7 @@ public class AuthController {
 
         JwtResponse response = new JwtResponse(token);
 
-        return response;
+        return ResponseEntity.ok(response);
     }
 
 }

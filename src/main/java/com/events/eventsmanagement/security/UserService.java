@@ -1,9 +1,13 @@
 package com.events.eventsmanagement.security;
 
-
 import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.repositories.UserRepository;
+import javassist.NotFoundException;
+import lombok.SneakyThrows;
+import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,22 +25,34 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
-    private PasswordEncoder passwordEncoder(){
+    @Bean
+    private PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        return new User("anas", passwordEncoder().encode("anas"), AuthorityUtils.NO_AUTHORITIES);
+        AppUser user = userRepository.findByEmail(userName);
+        if (user == null) {
+            throw new UsernameNotFoundException("User Not found");
+        } else
+            return user;
     }
 
-    public AppUser createUser (AppUser user)
-    {
+    public ResponseEntity<AppUser> createUser(AppUser user) {
+        var userExists = userRepository.findByEmail(user.getEmail());
+        if (userExists != null) {
+            return ResponseEntity.unprocessableEntity().build();
+        }
+
+        else
+
         user.setPassword(passwordEncoder().encode(user.getPassword()));
-        return this.userRepository.save(user);
+        return ResponseEntity.ok(this.userRepository.save(user));
     }
 
-    public Iterable<AppUser> getAll(){
+    public Iterable<AppUser> getAll() {
         return userRepository.findAll();
     }
 }

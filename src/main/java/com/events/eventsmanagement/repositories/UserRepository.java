@@ -8,7 +8,9 @@ public interface UserRepository extends CrudRepository<AppUser, Integer> {
 
     /*User findByEmailAndPassword(String email, String Password) throws AuthException;
 
+
     Integer getCountByEmail(String email);
 
     User findById (int id);*/
+    public AppUser findByEmail(String email);
 }

@@ -50,10 +50,5 @@ public class AuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-
-    private Set<SimpleGrantedAuthority> getAuthority(AppUser user) {
-        Set<SimpleGrantedAuthority> authorities = new HashSet<>();
-        authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getRole().getName()));
-        return authorities;
-    }
+    
 }

@@ -14,10 +14,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final String[] PUBLIC_ENDPOINTS = {
-            "/events",
-            "users/register",
-            "/auth/",
-            "/auth/register"
+            "/auth/register",
+            "/auth/login"
     };
 
     @Bean
@@ -33,6 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(PUBLIC_ENDPOINTS).permitAll()
+                .antMatchers("/auth/allUsers").hasAuthority("SuperAdmin")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class);

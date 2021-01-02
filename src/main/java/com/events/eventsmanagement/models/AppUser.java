@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
@@ -30,14 +31,15 @@ public class AppUser implements UserDetails {
     private String gender;
     private String nationality;
     private int age;
+    @JsonIgnore
     private String password;
 
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL)
-    @JsonManagedReference(value="user-events")
+    @JsonManagedReference(value = "user-events")
     private List<Event> createdEvents = new ArrayList<>();
 
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL)
-    @JsonManagedReference(value="user-bookings")
+    @JsonManagedReference(value = "user-bookings")
     private List<Reservation> bookedReservations = new ArrayList<>();
 
     @OneToOne
@@ -47,7 +49,9 @@ public class AppUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+        List<GrantedAuthority> list = new ArrayList<GrantedAuthority>();
+        list.add(new SimpleGrantedAuthority(role.getName()));
+        return list;
     }
 
     @Override

@@ -35,14 +35,17 @@ public class AuthController extends BaseController {
 
     @PostMapping("/register")
     public ResponseEntity<?> Register(@RequestBody AppUser appUser) {
-        return userService.createUser(appUser);
+
+        userService.createUser(appUser);
+        appUser.getAuthorities();
+        return ResponseEntity.ok(appUser.getAuthorities());
     }
 
-    /*@GetMapping("/")
+    @GetMapping("/allUsers")
     public ResponseEntity<Iterable<AppUser>> getAllUsers() {
         var users = userRepository.findAll();
         return ResponseEntity.ok(users);
-    }*/
+    }
 
     @GetMapping("/loggedInUser")
     public ResponseEntity<Optional<AppUser>> getLoggedInUser() {
@@ -54,7 +57,7 @@ public class AuthController extends BaseController {
             return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/")
+    @PostMapping("/login")
     public ResponseEntity<JwtResponse> LogIn(@RequestBody loginDto loginRequest) {
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));

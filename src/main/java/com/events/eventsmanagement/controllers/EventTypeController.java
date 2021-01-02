@@ -9,7 +9,7 @@ import lombok.var;
 
 @RestController
 @RequestMapping("eventTypes")
-public class EventTypeController {
+public class EventTypeController extends BaseController {
 
     @Autowired
     private EventTypeRepository eventTypeRepository;

@@ -34,7 +34,7 @@ public class AuthController extends BaseController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/register")
-    public ResponseEntity<AppUser> Register(@RequestBody AppUser appUser) {
+    public ResponseEntity<?> Register(@RequestBody AppUser appUser) {
         return userService.createUser(appUser);
     }
 

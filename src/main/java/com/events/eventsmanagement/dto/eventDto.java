@@ -1,6 +1,7 @@
 package com.events.eventsmanagement.dto;
 
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 
@@ -10,4 +11,5 @@ public class eventDto {
     private Date eventDate;
     private int userid;
     private int eventtypeid;
+    private MultipartFile image;
 }

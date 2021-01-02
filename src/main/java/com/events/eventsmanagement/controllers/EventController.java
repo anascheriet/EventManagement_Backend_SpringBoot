@@ -12,13 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 @RestController
 @RequestMapping("/events")
-public class EventController {
+public class EventController extends BaseController {
 
     @Autowired
     private EventRepository eventRepository;
@@ -30,15 +31,15 @@ public class EventController {
     private EventTypeRepository eventTypeRepository;
 
 
-
     @PostMapping("/create")
-    public ResponseEntity<eventDto> addEvent(@RequestBody eventDto eventDto) {
+    public ResponseEntity<eventDto> addEvent(@RequestBody eventDto eventDto) throws IOException {
         var user = userRepository.findById(eventDto.getUserid());
         var eventType = eventTypeRepository.findById(eventDto.getEventtypeid());
 
         if (!user.isPresent() || !eventType.isPresent()) {
             return ResponseEntity.unprocessableEntity().build();
         }
+        //saveUploadedFile(eventDto.getImage());
 
         Event createdEvent = new Event(eventDto.getEventName(), eventDto.getEventDate(), user.get(), eventType.get());
         eventRepository.save(createdEvent);

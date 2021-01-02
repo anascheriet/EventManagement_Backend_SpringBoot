@@ -29,21 +29,8 @@ public class AppUser implements UserDetails {
     private String email;
     private String gender;
     private String nationality;
-    private String role;
     private int age;
-    @JsonIgnore
     private String password;
-
-
-    public AppUser( String displayName, String email, String gender, String nationality, String role, int age, String password) {
-        this.displayName = displayName;
-        this.email = email;
-        this.gender = gender;
-        this.nationality = nationality;
-        this.role = role;
-        this.age = age;
-        this.password = password;
-    }
 
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL)
     @JsonManagedReference(value="user-events")
@@ -52,6 +39,10 @@ public class AppUser implements UserDetails {
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL)
     @JsonManagedReference(value="user-bookings")
     private List<Reservation> bookedReservations = new ArrayList<>();
+
+    @OneToOne
+    @JoinColumn(name = "role_id", referencedColumnName = "id")
+    private Role role;
 
 
     @Override

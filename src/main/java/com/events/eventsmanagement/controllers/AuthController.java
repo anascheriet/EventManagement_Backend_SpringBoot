@@ -16,9 +16,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import com.events.eventsmanagement.dto.loginDto;
 
+import java.util.Optional;
+
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController extends BaseController {
     @Autowired
     private UserRepository userRepository;
 
@@ -36,10 +38,20 @@ public class AuthController {
         return userService.createUser(appUser);
     }
 
-    @GetMapping("/")
+    /*@GetMapping("/")
     public ResponseEntity<Iterable<AppUser>> getAllUsers() {
         var users = userRepository.findAll();
         return ResponseEntity.ok(users);
+    }*/
+
+    @GetMapping("/loggedInUser")
+    public ResponseEntity<Optional<AppUser>> getLoggedInUser() {
+        var userId = getCurrentUser().getId();
+        var user = userRepository.findById(userId);
+        if (!user.isPresent()) {
+            return ResponseEntity.unprocessableEntity().build();
+        } else
+            return ResponseEntity.ok(user);
     }
 
     @PostMapping("/")

@@ -43,7 +43,7 @@ public class Event {
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     @JsonManagedReference
-    private List<Reservation> ClientReservations = new ArrayList<>();
+    private List<Reservation> clientReservations = new ArrayList<>();
 
     public Event(String eventName, Date eventDate, AppUser appUser, EventType eventType) {
         this.createdAt = new Date();

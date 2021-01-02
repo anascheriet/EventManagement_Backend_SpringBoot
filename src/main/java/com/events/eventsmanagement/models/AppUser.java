@@ -31,6 +31,7 @@ public class AppUser implements UserDetails {
     private String nationality;
     private String role;
     private int age;
+    @JsonIgnore
     private String password;
 
 

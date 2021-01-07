@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("reservations")
-public class ReservationController {
+public class ReservationController extends BaseController {
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -30,7 +30,7 @@ public class ReservationController {
 
     @PostMapping("/create")
     public ResponseEntity<reservationDto> addReservation(@RequestBody reservationDto reservationDto) {
-        var user = userRepository.findById(reservationDto.getUserid());
+        var user = userRepository.findById(getCurrentUser().getId());
         var event = eventRepository.findById(reservationDto.getEventid());
 
         if (!user.isPresent()) {

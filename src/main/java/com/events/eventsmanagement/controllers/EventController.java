@@ -38,7 +38,7 @@ public class EventController extends BaseController {
 
     @PostMapping("/create")
     public ResponseEntity<eventDto> addEvent(@RequestBody eventDto eventDto) throws IOException {
-        var user = userRepository.findById(eventDto.getUserid());
+        var user = userRepository.findById(getCurrentUser().getId());
         var eventType = eventTypeRepository.findById(eventDto.getEventtypeid());
 
         if (!user.isPresent() || !eventType.isPresent()) {

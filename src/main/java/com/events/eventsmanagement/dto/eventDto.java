@@ -9,7 +9,6 @@ import java.util.Date;
 public class eventDto {
     private String eventName;
     private Date eventDate;
-    private int userid;
     private int eventtypeid;
     private MultipartFile image;
 }

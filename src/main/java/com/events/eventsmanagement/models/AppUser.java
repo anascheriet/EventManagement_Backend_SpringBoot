@@ -32,7 +32,6 @@ public class AppUser implements UserDetails {
     private String gender;
     private String nationality;
     private int age;
-    @JsonIgnore
     private String password;
 
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL)

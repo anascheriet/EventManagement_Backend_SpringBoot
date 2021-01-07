@@ -65,14 +65,13 @@ public class UserService implements UserDetailsService {
         boolean roleShouldBeAdmin = false;
 
         try {
-            if (getCurrentUser().getDisplayName().equals(null))
-                roleShouldBeAdmin = false;
-            else
+            if (getCurrentUser().getRole().getName().equals("SuperAdmin"))
                 roleShouldBeAdmin = true;
+            else
+                roleShouldBeAdmin = false;
         } catch (NullPointerException | ClassCastException c) {
             System.out.print("Caught NullPointerException");
         }
-
 
         var userExists = userRepository.findByEmail(user.getEmail());
         if (userExists != null) {
@@ -92,8 +91,6 @@ public class UserService implements UserDetailsService {
 
         return ResponseEntity.ok(userRepository.save(user));
     }
-
-
 
 
 }

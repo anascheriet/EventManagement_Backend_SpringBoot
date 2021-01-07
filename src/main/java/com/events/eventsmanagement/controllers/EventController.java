@@ -7,10 +7,12 @@ import com.events.eventsmanagement.repositories.UserRepository;
 import com.events.eventsmanagement.dto.eventDto;
 import com.events.eventsmanagement.dto.eventGetDto;
 import com.events.eventsmanagement.security.UserService;
+import com.events.eventsmanagement.util.fileUploadService;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,6 +31,9 @@ public class EventController extends BaseController {
 
     @Autowired
     private EventTypeRepository eventTypeRepository;
+
+    @Autowired
+    private fileUploadService fileUploadService;
 
 
     @PostMapping("/create")
@@ -76,6 +81,11 @@ public class EventController extends BaseController {
         }).orElse(null);
 
         return ResponseEntity.ok(req);
+    }
+
+    @PostMapping("/image")
+    public String uploadImage(MultipartFile file) {
+        return fileUploadService.singleFileUpload(file);
     }
 
 }

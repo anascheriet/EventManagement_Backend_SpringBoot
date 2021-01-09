@@ -46,7 +46,6 @@ public class AppUser implements UserDetails {
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> list = new ArrayList<GrantedAuthority>();

@@ -1,5 +1,6 @@
 package com.events.eventsmanagement.controllers;
 
+import com.events.eventsmanagement.dto.GetUserDto;
 import com.events.eventsmanagement.dto.JwtResponse;
 import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.repositories.UserRepository;
@@ -56,7 +57,7 @@ public class AuthController extends BaseController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<JwtResponse> LogIn(@RequestBody loginDto loginRequest) {
+    public ResponseEntity<?> LogIn(@RequestBody loginDto loginRequest) {
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -65,8 +66,8 @@ public class AuthController extends BaseController {
         String token = tokenUtil.generateToken(userDetails);
 
         JwtResponse response = new JwtResponse(token);
-
-        return ResponseEntity.ok(response);
+        GetUserDto userDto = new GetUserDto(getCurrentUser(), response);
+        return ResponseEntity.ok(userDto);
     }
 
 }

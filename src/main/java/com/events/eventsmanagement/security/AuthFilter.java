@@ -3,6 +3,8 @@ package com.events.eventsmanagement.security;
 import com.events.eventsmanagement.models.AppUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,6 +21,7 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class AuthFilter extends OncePerRequestFilter {
 
 
@@ -35,6 +38,11 @@ public class AuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String header = request.getHeader(TOKEN_HEADER);
         final SecurityContext securityContext = SecurityContextHolder.getContext();
+        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
+        response.setHeader("Access-Control-Allow-Credentials", "true");
+        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+        response.setHeader("Access-Control-Max-Age", "3600");
+        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me");
         if (header != null && securityContext.getAuthentication() == null) {
             String token = header.substring("Bearer".length());
             String userName = tokenUtil.getUserNameFromToken(token);

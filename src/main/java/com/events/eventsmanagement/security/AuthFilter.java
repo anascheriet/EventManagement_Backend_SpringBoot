@@ -21,9 +21,8 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 
-@Order(Ordered.HIGHEST_PRECEDENCE)
+/*@Order(Ordered.HIGHEST_PRECEDENCE)*/
 public class AuthFilter extends OncePerRequestFilter {
-
 
     @Value("${auth.header}")
     private String TOKEN_HEADER;
@@ -38,11 +37,6 @@ public class AuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         final String header = request.getHeader(TOKEN_HEADER);
         final SecurityContext securityContext = SecurityContextHolder.getContext();
-        response.setHeader("Access-Control-Allow-Origin", request.getHeader("Origin"));
-        response.setHeader("Access-Control-Allow-Credentials", "true");
-        response.setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
-        response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Headers", "Content-Type, Accept, X-Requested-With, remember-me");
         if (header != null && securityContext.getAuthentication() == null) {
             String token = header.substring("Bearer".length());
             String userName = tokenUtil.getUserNameFromToken(token);
@@ -58,5 +52,5 @@ public class AuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-    
+
 }

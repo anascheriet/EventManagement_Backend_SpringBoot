@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import lombok.var;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("eventTypes")
 public class EventTypeController extends BaseController {
 

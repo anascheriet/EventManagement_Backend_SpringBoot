@@ -20,6 +20,7 @@ import com.events.eventsmanagement.dto.loginDto;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/auth")
 public class AuthController extends BaseController {
     @Autowired
@@ -55,6 +56,7 @@ public class AuthController extends BaseController {
         } else
             return ResponseEntity.ok(user);
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<?> LogIn(@RequestBody loginDto loginRequest) {

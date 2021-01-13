@@ -1,12 +1,13 @@
 package com.events.eventsmanagement.controllers;
 
+import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.models.Event;
+import com.events.eventsmanagement.models.EventType;
 import com.events.eventsmanagement.repositories.EventRepository;
 import com.events.eventsmanagement.repositories.EventTypeRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
 import com.events.eventsmanagement.dto.eventDto;
 import com.events.eventsmanagement.dto.eventGetDto;
-import com.events.eventsmanagement.security.UserService;
 import com.events.eventsmanagement.util.fileUploadService;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -47,7 +49,7 @@ public class EventController extends BaseController {
         }
         //saveUploadedFile(eventDto.getImage());
 
-        Event createdEvent = new Event(eventDto.getEventName(), eventDto.getEventDate(), user.get(), eventType.get());
+        Event createdEvent = new Event(eventDto.getEventName(),eventType.get(),eventDto.getCountry(),eventDto.getCity(),eventDto.getDescription(),eventDto.getEventDate(),eventDto.getTicketprice(),eventDto.getAvailabletickets(), user.get());
         eventRepository.save(createdEvent);
         return ResponseEntity.ok(eventDto);
     }

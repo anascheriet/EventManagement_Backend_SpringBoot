@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,6 +25,11 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String eventName;
+    private String description;
+    private String country;
+    private String city;
+    private int availabletickets;
+    private Float ticketprice;
     private Date eventDate;
     //private MultipartFile image;
 
@@ -36,7 +40,7 @@ public class Event {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "appuser_id")
-    @JsonBackReference(value="user-events")
+    @JsonBackReference(value = "user-events")
     private AppUser appUser;
 
     @OneToOne
@@ -47,9 +51,14 @@ public class Event {
     @JsonManagedReference
     private List<Reservation> clientReservations = new ArrayList<>();
 
-    public Event(String eventName, Date eventDate, AppUser appUser, EventType eventType) {
+    public Event(String eventName, EventType eventType, String country, String city, String description, Date eventDate, Float ticketprice, int availabletickets, AppUser appUser) {
         this.createdAt = new Date();
         this.eventName = eventName;
+        this.description = description;
+        this.country = country;
+        this.city = city;
+        this.availabletickets = availabletickets;
+        this.ticketprice = ticketprice;
         this.eventDate = eventDate;
         this.appUser = appUser;
         this.eventType = eventType;

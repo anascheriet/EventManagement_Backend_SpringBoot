@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 public class fileUploadService {
 
     //Save the uploaded file to this folder
-    private static String UPLOAD_FOLDER = "/Users/anascheriet/Desktop/EventsImages/";
+    private static String UPLOAD_FOLDER = "/Users/anascheriet/Documents/Projects/Spring Boot/EventsManagement/src/main/resources/static/";
 
     public String singleFileUpload(MultipartFile file) {
         if (file.isEmpty()) {

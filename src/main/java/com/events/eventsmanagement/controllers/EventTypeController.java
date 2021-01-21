@@ -22,15 +22,28 @@ public class EventTypeController extends BaseController {
     }
 
     @GetMapping("/")
-    public Iterable<EventType> getEventTypes() {
-        return eventTypeRepository.findAll();
+    public ResponseEntity<Iterable<EventType>> getEventTypes() {
+        var eventTypes = eventTypeRepository.findAll();
+        return ResponseEntity.ok(eventTypes);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<EventType> getEventTypeByID(@PathVariable int id) {
+        var eventTypes = eventTypeRepository.findById(id);
+        return ResponseEntity.ok(eventTypes.get());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EventType> updateEvType(@PathVariable int id, @RequestBody EventType req){
+    public ResponseEntity<EventType> updateEvType(@PathVariable int id, @RequestBody EventType req) {
         var foundType = eventTypeRepository.findById(id);
         req.setId(foundType.get().getId());
-        return ResponseEntity.ok( eventTypeRepository.save(req));
+        return ResponseEntity.ok(eventTypeRepository.save(req));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteEvType(@PathVariable int id) {
+        eventTypeRepository.deleteById(id);
+        return ResponseEntity.ok("Event type with id " + id + "has been deleted !");
     }
 
 }

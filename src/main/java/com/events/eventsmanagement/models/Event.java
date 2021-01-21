@@ -25,12 +25,14 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String eventName;
+    @Column(length = 3000)
     private String description;
     private String country;
     private String city;
-    private int availabletickets;
-    private Float ticketprice;
+    private int availableTickets;
+    private Float ticketPrice;
     private Date eventDate;
+    private String imagePath;
     //private MultipartFile image;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -51,16 +53,17 @@ public class Event {
     @JsonManagedReference
     private List<Reservation> clientReservations = new ArrayList<>();
 
-    public Event(String eventName, EventType eventType, String country, String city, String description, Date eventDate, Float ticketprice, int availabletickets, AppUser appUser) {
+    public Event(String eventName, EventType eventType, String country, String city, String description, Date eventDate, Float ticketPrice, int availableTickets, AppUser appUser, String imagePath) {
         this.createdAt = new Date();
         this.eventName = eventName;
         this.description = description;
         this.country = country;
         this.city = city;
-        this.availabletickets = availabletickets;
-        this.ticketprice = ticketprice;
+        this.availableTickets = availableTickets;
+        this.ticketPrice = ticketPrice;
         this.eventDate = eventDate;
-        this.appUser = appUser;
         this.eventType = eventType;
+        this.appUser = appUser;
+        this.imagePath = imagePath;
     }
 }

@@ -49,7 +49,8 @@ public class EventController extends BaseController {
         }
         //saveUploadedFile(eventDto.getImage());
 
-        Event createdEvent = new Event(eventDto.getEventName(),eventType.get(),eventDto.getCountry(),eventDto.getCity(),eventDto.getDescription(),eventDto.getEventDate(),eventDto.getTicketprice(),eventDto.getAvailabletickets(), user.get());
+        Event createdEvent = new Event(eventDto.getEventName(), eventType.get(), eventDto.getCountry(), eventDto.getCity(), eventDto.getDescription(),
+                eventDto.getEventDate(), eventDto.getTicketprice(), eventDto.getAvailabletickets(), user.get(), eventDto.getImage());
         eventRepository.save(createdEvent);
         return ResponseEntity.ok(eventDto);
     }
@@ -60,7 +61,7 @@ public class EventController extends BaseController {
         List<eventGetDto> returnedEvents = new ArrayList<>();
 
         events.forEach(ev -> {
-            var event = eventRepository.findById(ev.getId());
+            //var event = eventRepository.findById(ev.getId());
             var returnedEvent = new eventGetDto(ev, ev.getAppUser().getId(), ev.getAppUser().getDisplayName());
             returnedEvents.add(returnedEvent);
         });
@@ -78,8 +79,16 @@ public class EventController extends BaseController {
     public ResponseEntity<eventDto> patchEvent(@PathVariable int id, @RequestBody eventDto req) {
         var foundEvent = eventRepository.findById(id);
         foundEvent.map(ev -> {
-            ev.setEventDate(req.getEventDate());
+            if (req.getEventDate() != null) {
+                ev.setEventDate(req.getEventDate());
+            }
             ev.setEventName(req.getEventName());
+            ev.setAvailableTickets(req.getAvailabletickets());
+            ev.setCountry(req.getCountry());
+            ev.setCity(req.getCity());
+            ev.setDescription(req.getDescription());
+            ev.setImagePath(req.getImage());
+            ev.setTicketPrice(req.getTicketprice());
             return ResponseEntity.ok(eventRepository.save(ev));
         }).orElse(null);
 
@@ -88,6 +97,7 @@ public class EventController extends BaseController {
 
     @PostMapping("/image")
     public String uploadImage(MultipartFile file) {
+        System.out.println((file));
         return fileUploadService.singleFileUpload(file);
     }
 

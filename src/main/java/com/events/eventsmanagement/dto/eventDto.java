@@ -15,5 +15,5 @@ public class eventDto {
     private String city;
     private int availabletickets;
     private Float ticketprice;
-    private MultipartFile image;
+    private String image;
 }

@@ -68,8 +68,7 @@ public class AuthController extends BaseController {
         String token = tokenUtil.generateToken(userDetails);
 
         JwtResponse response = new JwtResponse(token);
-        GetUserDto userDto = new GetUserDto(getCurrentUser(), response);
-        return ResponseEntity.ok(userDto);
+        return ResponseEntity.ok(response);
     }
 
 }

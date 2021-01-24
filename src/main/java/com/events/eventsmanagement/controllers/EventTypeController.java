@@ -1,6 +1,7 @@
 package com.events.eventsmanagement.controllers;
 
 import com.events.eventsmanagement.models.EventType;
+import com.events.eventsmanagement.repositories.EventRepository;
 import com.events.eventsmanagement.repositories.EventTypeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,9 @@ public class EventTypeController extends BaseController {
 
     @Autowired
     private EventTypeRepository eventTypeRepository;
+
+    @Autowired
+    private EventRepository eventRepository;
 
     @PostMapping("/create")
     public ResponseEntity<EventType> addEventType(@RequestBody EventType eventType) {
@@ -42,7 +46,12 @@ public class EventTypeController extends BaseController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteEvType(@PathVariable int id) {
-        eventTypeRepository.deleteById(id);
+        var events = eventRepository.findAll().stream().filter(i -> i.getEventType().getId() == id).count();
+        if (events > 0) {
+            return ResponseEntity.badRequest().body("Can't delete this event type, it exists in an event");
+        } else {
+            eventTypeRepository.deleteById(id);
+        }
         return ResponseEntity.ok("Event type with id " + id + "has been deleted !");
     }
 

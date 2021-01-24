@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -38,7 +39,6 @@ public class EventController extends BaseController {
     @Autowired
     private fileUploadService fileUploadService;
 
-
     @PostMapping("/create")
     public ResponseEntity<eventDto> addEvent(@RequestBody eventDto eventDto) throws IOException {
         var user = userRepository.findById(getCurrentUser().getId());
@@ -56,7 +56,7 @@ public class EventController extends BaseController {
     }
 
     @GetMapping("/")
-    public ResponseEntity<Iterable<eventGetDto>> getAllUsers() {
+    public ResponseEntity<List<eventGetDto>> getAllEvents() {
         var events = eventRepository.findAll();
         List<eventGetDto> returnedEvents = new ArrayList<>();
 
@@ -100,5 +100,7 @@ public class EventController extends BaseController {
         System.out.println((file));
         return fileUploadService.singleFileUpload(file);
     }
+
+
 
 }

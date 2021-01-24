@@ -18,7 +18,6 @@ public class Reservation {
     @Id
     @GeneratedValue
     private int id;
-    private Date reservationDate;
     private int numOfPeople;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -28,22 +27,18 @@ public class Reservation {
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "appuser_id")
-    @JsonBackReference(value="user-bookings")
+    @JsonBackReference(value = "user-bookings")
     private AppUser appUser;
-
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "event_id")
     @JsonBackReference
     private Event event;
 
-    public Reservation(Date reservationDate, int numOfPeople, AppUser appUser, Event event)
-    {
+    public Reservation(int numOfPeople, AppUser appUser, Event event) {
         this.bookedAt = new Date();
-        this.reservationDate = reservationDate;
         this.numOfPeople = numOfPeople;
         this.appUser = appUser;
         this.event = event;
     }
-
 }

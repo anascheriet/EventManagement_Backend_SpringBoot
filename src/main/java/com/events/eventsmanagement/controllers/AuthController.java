@@ -2,14 +2,17 @@ package com.events.eventsmanagement.controllers;
 
 import com.events.eventsmanagement.dto.GetUserDto;
 import com.events.eventsmanagement.dto.JwtResponse;
+import com.events.eventsmanagement.dto.errorResponse;
 import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.repositories.UserRepository;
 import com.events.eventsmanagement.security.TokenUtil;
 import com.events.eventsmanagement.security.UserService;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,9 +63,16 @@ public class AuthController extends BaseController {
 
     @PostMapping("/login")
     public ResponseEntity<?> LogIn(@RequestBody loginDto loginRequest) {
-        final Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+
+        try {
+            final Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (BadCredentialsException e) {
+            var err = new errorResponse("Bad Credentials, please make sure your email and password are correct");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+        }
 
         UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());
         String token = tokenUtil.generateToken(userDetails);
@@ -70,5 +80,13 @@ public class AuthController extends BaseController {
         JwtResponse response = new JwtResponse(token);
         return ResponseEntity.ok(response);
     }
+
+   /* @PostMapping("/forgotPassword")
+    public ResponseEntity<?> forgotPassword(@RequestBody String email) {
+        var user = userRepository.findByEmail(email);
+        if (user != null) {
+
+        }
+    }*/
 
 }

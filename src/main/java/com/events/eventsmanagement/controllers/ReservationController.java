@@ -110,43 +110,44 @@ public class ReservationController extends BaseController {
         return d.toInstant().atZone(ZoneId.systemDefault());
     }
 
+    private Double extractCurrentIncome(ZonedDateTime afterDate) {
+        return userRepository.findById(getCurrentUser().getId()).get().getCreatedEvents().stream()
+                .map(x -> x.getClientReservations().stream()
+                        .filter(y -> formatDate(y.getBookedAt()).isAfter(afterDate))
+                        .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
+    }
+
+    private Double extractLastIncome(ZonedDateTime afterDate, ZonedDateTime beforeDate) {
+        return userRepository.findById(getCurrentUser().getId()).get().getCreatedEvents().stream()
+                .map(x -> x.getClientReservations().stream()
+                        .filter(y -> formatDate(y.getBookedAt()).isAfter(afterDate) && formatDate(y.getBookedAt()).isBefore(beforeDate))
+                        .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
+    }
+
     @GetMapping("/income")
     public ResponseEntity<?> getIncome() {
-
-        var user = userRepository.findById(getCurrentUser().getId());
 
         final ZonedDateTime todayDate = ZonedDateTime.now();
         final ZonedDateTime startOfLastWeek = todayDate.minusWeeks(1).with(DayOfWeek.MONDAY);
 
+        /*Last week range*/
+        final ZonedDateTime endOfLastWeek = startOfLastWeek.plusDays(6);
         /*HashMap to return*/
         HashMap incomeData = new HashMap();
 
-        /*Last week range*/
-        final ZonedDateTime endOfLastWeek = startOfLastWeek.plusDays(6);
-        /*var weekIncome = reservationRepository.findAll().stream()
-                .filter(x -> formatDate(x.getBookedAt())
-                        .isAfter(endOfLastWeek)).mapToDouble(x -> x.getEvent().getTicketPrice() * x.getNumOfPeople()).sum();*/
-
-        var weekIncome = user.get().getCreatedEvents().stream()
-                .map(x -> x.getClientReservations().stream()
-                        .filter(y -> formatDate(y.getBookedAt()).isAfter(endOfLastWeek))
-                        .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
-        ;
+        var currentWeekIncome = extractCurrentIncome(endOfLastWeek);
+        var lastWeekIncome = extractLastIncome(startOfLastWeek, endOfLastWeek);
+        var thisWeekAvg = (currentWeekIncome - lastWeekIncome) * 100 + "%";
 
         /*last Month range*/
-        final ZonedDateTime lastMonth = todayDate.minusMonths(1);
+        final ZonedDateTime thisMonthStart = todayDate.minusMonths(1);
+        final ZonedDateTime lastMonth = todayDate.minusMonths(2);
 
-       /* var monthIncome = reservationRepository.findAll().stream().filter(x -> formatDate(x.getBookedAt())
-                .isAfter(lastMonth)).mapToDouble(x -> x.getEvent().getTicketPrice() * x.getNumOfPeople()).sum();*/
+        var currentMonthIncome = extractCurrentIncome(thisMonthStart);
+        var lastMonthIncome = extractLastIncome(lastMonth, thisMonthStart);
+        var thisMonthAvg = (currentMonthIncome - lastMonthIncome) * 100 + "%";
 
-
-        var monthIncome =
-                user.get().getCreatedEvents().stream()
-                        .map(x -> x.getClientReservations().stream()
-                                .filter(y -> formatDate(y.getBookedAt()).isAfter(lastMonth))
-                                .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
-
-
+        var user = userRepository.findById(getCurrentUser().getId());
 
         /*Total Income*/
         /*var totalIncome = reservationRepository.findAll().stream().mapToDouble(x -> x.getEvent().getTicketPrice() * x.getNumOfPeople()).sum();*/
@@ -155,9 +156,11 @@ public class ReservationController extends BaseController {
                         .map(x -> x.getClientReservations().stream()
                                 .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
 
-        incomeData.put("weekIncome", weekIncome);
-        incomeData.put("monthIncome", monthIncome);
+        incomeData.put("weekIncome", currentWeekIncome);
+        incomeData.put("monthIncome", currentMonthIncome);
         incomeData.put("totalIncome", totalIncome);
+        incomeData.put("weekAvg", thisWeekAvg);
+        incomeData.put("monthAvg", thisMonthAvg);
 
         return ResponseEntity.ok(incomeData);
     }

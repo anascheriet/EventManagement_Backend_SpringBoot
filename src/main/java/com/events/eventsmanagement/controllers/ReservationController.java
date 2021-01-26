@@ -3,6 +3,7 @@ package com.events.eventsmanagement.controllers;
 import com.events.eventsmanagement.dto.reservationDto;
 import com.events.eventsmanagement.models.Reservation;
 import com.events.eventsmanagement.repositories.EventRepository;
+import com.events.eventsmanagement.repositories.EventTypeRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +32,9 @@ public class ReservationController extends BaseController {
 
     @Autowired
     private EventRepository eventRepository;
+
+    @Autowired
+    private EventTypeRepository eventTypeRepository;
 
     @PostMapping("/create")
     public ResponseEntity<?> addReservation(@RequestBody reservationDto reservationDto) {
@@ -267,8 +271,8 @@ public class ReservationController extends BaseController {
         }
     }
 
-    @GetMapping("/byMonth")
-    ResponseEntity<?> classReservationsByMonth() {
+    @GetMapping("/byBookingMonth")
+    public ResponseEntity<?> classReservationsByMonth() {
         Map<String, Integer> monthGroup = new HashMap<String, Integer>();
 
         monthGroup.put("January", 0);
@@ -301,5 +305,35 @@ public class ReservationController extends BaseController {
             );
         });
         return ResponseEntity.ok(monthGroup);
+    }
+
+    @GetMapping("/byEventType")
+    public ResponseEntity<?> classReservationsByEventType() {
+        HashMap<String, Integer> eventTypeGroup = new HashMap<>();
+
+        var types = eventTypeRepository.findAll();
+
+        types.forEach(a -> {
+            eventTypeGroup.put(a.getName(), 0);
+        });
+
+        var reserv = userRepository.findById(getCurrentUser().getId())
+                .get().getCreatedEvents().stream().filter(y -> y.getClientReservations().size() != 0);
+
+
+        reserv.forEach(x -> {
+            x.getClientReservations().forEach(
+                    r -> {
+                        for (String key : eventTypeGroup.keySet()) {
+                            if (r.getEvent().getEventType().getName().equals(key)) {
+                                int count = eventTypeGroup.get(key);
+                                eventTypeGroup.put(key, count + 1);
+                            }
+                        }
+                    }
+            );
+        });
+
+        return ResponseEntity.ok(eventTypeGroup);
     }
 }

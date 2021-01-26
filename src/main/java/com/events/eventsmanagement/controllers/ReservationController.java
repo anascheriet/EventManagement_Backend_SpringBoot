@@ -16,10 +16,8 @@ import com.events.eventsmanagement.repositories.ReservationRepository;
 import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -137,7 +135,11 @@ public class ReservationController extends BaseController {
 
         var currentWeekIncome = extractCurrentIncome(endOfLastWeek);
         var lastWeekIncome = extractLastIncome(startOfLastWeek, endOfLastWeek);
-        var thisWeekAvg = (currentWeekIncome - lastWeekIncome) * 100 + "%";
+        System.out.println("currentWeekIncome " + currentWeekIncome);
+        System.out.println("lastWeekIncome " + lastWeekIncome);
+        var thisWeekAvg = (currentWeekIncome - lastWeekIncome) * 100;
+
+        System.out.println("thisWeekAvg " + thisWeekAvg);
 
         /*last Month range*/
         final ZonedDateTime thisMonthStart = todayDate.minusMonths(1);
@@ -145,7 +147,7 @@ public class ReservationController extends BaseController {
 
         var currentMonthIncome = extractCurrentIncome(thisMonthStart);
         var lastMonthIncome = extractLastIncome(lastMonth, thisMonthStart);
-        var thisMonthAvg = (currentMonthIncome - lastMonthIncome) * 100 + "%";
+        var thisMonthAvg = (currentMonthIncome - lastMonthIncome) * 100;
 
         var user = userRepository.findById(getCurrentUser().getId());
 
@@ -156,14 +158,148 @@ public class ReservationController extends BaseController {
                         .map(x -> x.getClientReservations().stream()
                                 .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
 
+        var totalIncomeLastMonth =
+                user.get().getCreatedEvents().stream()
+                        .map(x -> x.getClientReservations().stream().filter(y -> formatDate(y.getBookedAt()).isBefore(thisMonthStart))
+                                .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
+
+        var totalAvg = (totalIncome - totalIncomeLastMonth) * 100;
+
         incomeData.put("weekIncome", currentWeekIncome);
         incomeData.put("monthIncome", currentMonthIncome);
         incomeData.put("totalIncome", totalIncome);
         incomeData.put("weekAvg", thisWeekAvg);
         incomeData.put("monthAvg", thisMonthAvg);
+        incomeData.put("totalAvg", totalAvg);
 
         return ResponseEntity.ok(incomeData);
     }
 
+    @GetMapping("/byClientCountry")
+    public ResponseEntity<?> classReservationsByCountry() {
 
+        Map<String, Integer> countries = new HashMap<String, Integer>();
+
+        var reser = userRepository.findById(getCurrentUser().getId())
+                .get().getCreatedEvents().stream().filter(y -> !y.getClientReservations().isEmpty());
+
+        reser.forEach(x -> {
+            x.getClientReservations().forEach(a -> {
+                if (!countries.containsKey(a.getAppUser().getCountry())) {
+                    countries.put(a.getAppUser().getCountry(), 1);
+                } else {
+                    int count = countries.get(a.getAppUser().getCountry());
+                    countries.put(a.getAppUser().getCountry(), count + 1);
+                }
+            });
+        });
+        return ResponseEntity.ok(countries);
+    }
+
+    @GetMapping("/byClientAge")
+    public ResponseEntity<?> classReservationsByClientAge() {
+
+        Map<String, Integer> ageGroup = new HashMap<String, Integer>();
+
+        ageGroup.put("18 to 29", 0);
+        ageGroup.put("30 to 39", 0);
+        ageGroup.put("40 to 65", 0);
+        ageGroup.put("Above 66", 0);
+
+        var reserv = userRepository.findById(getCurrentUser().getId())
+                .get().getCreatedEvents().stream().filter(y -> y.getClientReservations().size() != 0);
+
+
+        reserv.forEach(a -> {
+            a.getClientReservations().forEach(
+                    x -> {
+                        System.out.println(x.getAppUser().getDisplayName());
+                        if (x.getAppUser().getAge() >= 18 && x.getAppUser().getAge() <= 29) {
+                            int count = ageGroup.get("18 to 29");
+                            ageGroup.put("18 to 29", count + 1);
+                        } else if (x.getAppUser().getAge() >= 30 && x.getAppUser().getAge() <= 39) {
+                            int count = ageGroup.get("30 to 39");
+                            ageGroup.put("30 to 39", count + 1);
+                        } else if (x.getAppUser().getAge() >= 40 && x.getAppUser().getAge() <= 65) {
+                            int count = ageGroup.get("40 to 65");
+                            ageGroup.put("40 to 65", count + 1);
+                        } else if (x.getAppUser().getAge() > 66) {
+                            int count = ageGroup.get("Above 66");
+                            ageGroup.put("Above 66", count + 1);
+                        }
+                    });
+        });
+
+        return ResponseEntity.ok(ageGroup);
+
+    }
+
+
+    public String getMonthString(int month) {
+        switch (month) {
+            case 0:
+                return "January";
+            case 1:
+                return "February";
+            case 2:
+                return "March";
+            case 3:
+                return "April";
+            case 4:
+                return "May";
+            case 5:
+                return "June";
+            case 6:
+                return "July";
+            case 7:
+                return "August";
+            case 8:
+                return "September";
+            case 9:
+                return "October";
+            case 10:
+                return "November";
+            case 11:
+                return "December";
+            default:
+                return " ";
+
+        }
+    }
+
+    @GetMapping("/byMonth")
+    ResponseEntity<?> classReservationsByMonth() {
+        Map<String, Integer> monthGroup = new HashMap<String, Integer>();
+
+        monthGroup.put("January", 0);
+        monthGroup.put("February", 0);
+        monthGroup.put("March", 0);
+        monthGroup.put("April", 0);
+        monthGroup.put("May", 0);
+        monthGroup.put("June", 0);
+        monthGroup.put("July", 0);
+        monthGroup.put("August", 0);
+        monthGroup.put("September", 0);
+        monthGroup.put("October", 0);
+        monthGroup.put("November", 0);
+        monthGroup.put("December", 0);
+
+        var reserv = userRepository.findById(getCurrentUser().getId())
+                .get().getCreatedEvents().stream().filter(y -> y.getClientReservations().size() != 0);
+
+        reserv.forEach(x -> {
+            x.getClientReservations().forEach(
+                    a -> {
+                        //Loop over MonthGroup keys
+                        for (String key : monthGroup.keySet()) {
+                            if (getMonthString(a.getBookedAt().getMonth()).equals(key)) {
+                                int count = monthGroup.get(key);
+                                monthGroup.put(key, count + 1);
+                            }
+                        }
+                    }
+            );
+        });
+        return ResponseEntity.ok(monthGroup);
+    }
 }

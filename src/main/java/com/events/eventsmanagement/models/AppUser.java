@@ -30,7 +30,8 @@ public class AppUser implements UserDetails {
     /*@NotEmpty*/
     private String email;
     private String gender;
-    private String nationality;
+    private String country;
+    private String city;
     private int age;
     private String password;
 

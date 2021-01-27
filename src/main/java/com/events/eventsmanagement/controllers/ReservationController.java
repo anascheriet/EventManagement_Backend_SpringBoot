@@ -1,6 +1,8 @@
 package com.events.eventsmanagement.controllers;
 
 import com.events.eventsmanagement.dto.reservationDto;
+import com.events.eventsmanagement.models.AppUser;
+import com.events.eventsmanagement.models.Event;
 import com.events.eventsmanagement.models.Reservation;
 import com.events.eventsmanagement.repositories.EventRepository;
 import com.events.eventsmanagement.repositories.EventTypeRepository;
@@ -18,7 +20,7 @@ import java.time.DayOfWeek;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
@@ -112,18 +114,46 @@ public class ReservationController extends BaseController {
         return d.toInstant().atZone(ZoneId.systemDefault());
     }
 
+
+    private Optional<AppUser> loggedUser() {
+        return userRepository.findById(getCurrentUser().getId());
+    }
+
     private Double extractCurrentIncome(ZonedDateTime afterDate) {
-        return userRepository.findById(getCurrentUser().getId()).get().getCreatedEvents().stream()
+        return loggedUser().get().getRole().getName().equals("Admin") ? loggedUser().get().getCreatedEvents().stream()
                 .map(x -> x.getClientReservations().stream()
                         .filter(y -> formatDate(y.getBookedAt()).isAfter(afterDate))
-                        .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
+                        .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum()
+                :
+                loggedUser().get().getRole().getName().equals("SuperAdmin") ?
+                        eventRepository.findAll().stream().map(x -> x.getClientReservations().stream()
+                                .filter(y -> formatDate(y.getBookedAt()).isAfter(afterDate))
+                                .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum()
+                        : 0;
     }
 
     private Double extractLastIncome(ZonedDateTime afterDate, ZonedDateTime beforeDate) {
-        return userRepository.findById(getCurrentUser().getId()).get().getCreatedEvents().stream()
+        return loggedUser().get().getRole().getName().equals("Admin") ? loggedUser().get().getCreatedEvents().stream()
                 .map(x -> x.getClientReservations().stream()
                         .filter(y -> formatDate(y.getBookedAt()).isAfter(afterDate) && formatDate(y.getBookedAt()).isBefore(beforeDate))
-                        .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
+                        .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum()
+                :
+                loggedUser().get().getRole().getName().equals("SuperAdmin") ?
+                        eventRepository.findAll().stream().map(x -> x.getClientReservations().stream()
+                                .filter(y -> formatDate(y.getBookedAt()).isAfter(afterDate) && formatDate(y.getBookedAt()).isBefore(beforeDate))
+                                .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum() : 0;
+
+    }
+
+    public Stream<Event> getBookings() {
+        return
+                loggedUser().get().getRole().getName().equals("Admin") ?
+                        loggedUser()
+                                .get().getCreatedEvents().stream().filter(y -> !y.getClientReservations().isEmpty())
+                        :
+                        loggedUser().get().getRole().getName().equals("SuperAdmin") ?
+                                eventRepository.findAll().stream().filter(y -> !y.getClientReservations().isEmpty()) : null;
+
     }
 
     @GetMapping("/income")
@@ -153,19 +183,27 @@ public class ReservationController extends BaseController {
         var lastMonthIncome = extractLastIncome(lastMonth, thisMonthStart);
         var thisMonthAvg = (currentMonthIncome - lastMonthIncome) * 100;
 
-        var user = userRepository.findById(getCurrentUser().getId());
-
         /*Total Income*/
         /*var totalIncome = reservationRepository.findAll().stream().mapToDouble(x -> x.getEvent().getTicketPrice() * x.getNumOfPeople()).sum();*/
-        var totalIncome =
-                user.get().getCreatedEvents().stream()
+        var totalIncome = loggedUser().get().getRole().getName().equals("Admin") ?
+                loggedUser().get().getCreatedEvents().stream()
                         .map(x -> x.getClientReservations().stream()
-                                .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
+                                .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum()
+                :
+                loggedUser().get().getRole().getName().equals("SuperAdmin") ?
+                        eventRepository.findAll().stream().map(x -> x.getClientReservations().stream()
+                                .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum() : 0;
 
-        var totalIncomeLastMonth =
-                user.get().getCreatedEvents().stream()
+        var totalIncomeLastMonth = loggedUser().get().getRole().getName().equals("Admin") ?
+                loggedUser().get().getCreatedEvents().stream()
                         .map(x -> x.getClientReservations().stream().filter(y -> formatDate(y.getBookedAt()).isBefore(thisMonthStart))
-                                .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum();
+                                .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum()
+                :
+                loggedUser().get().getRole().getName().equals("SuperAdmin") ? eventRepository.findAll().stream()
+                        .map(x -> x.getClientReservations().stream().filter(y -> formatDate(y.getBookedAt()).isBefore(thisMonthStart))
+                                .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople()).sum()).mapToDouble(s -> s).sum()
+                        : 0;
+
 
         var totalAvg = (totalIncome - totalIncomeLastMonth) * 100;
 
@@ -184,10 +222,7 @@ public class ReservationController extends BaseController {
 
         Map<String, Integer> countries = new HashMap<String, Integer>();
 
-        var reser = userRepository.findById(getCurrentUser().getId())
-                .get().getCreatedEvents().stream().filter(y -> !y.getClientReservations().isEmpty());
-
-        reser.forEach(x -> {
+        getBookings().forEach(x -> {
             x.getClientReservations().forEach(a -> {
                 if (!countries.containsKey(a.getAppUser().getCountry())) {
                     countries.put(a.getAppUser().getCountry(), 1);
@@ -197,6 +232,7 @@ public class ReservationController extends BaseController {
                 }
             });
         });
+
         return ResponseEntity.ok(countries);
     }
 
@@ -210,11 +246,8 @@ public class ReservationController extends BaseController {
         ageGroup.put("40 to 65", 0);
         ageGroup.put("Above 66", 0);
 
-        var reserv = userRepository.findById(getCurrentUser().getId())
-                .get().getCreatedEvents().stream().filter(y -> y.getClientReservations().size() != 0);
 
-
-        reserv.forEach(a -> {
+        getBookings().forEach(a -> {
             a.getClientReservations().forEach(
                     x -> {
                         System.out.println(x.getAppUser().getDisplayName());
@@ -234,10 +267,10 @@ public class ReservationController extends BaseController {
                     });
         });
 
+
         return ResponseEntity.ok(ageGroup);
 
     }
-
 
     public String getMonthString(int month) {
         switch (month) {
@@ -288,10 +321,7 @@ public class ReservationController extends BaseController {
         monthGroup.put("November", 0);
         monthGroup.put("December", 0);
 
-        var reserv = userRepository.findById(getCurrentUser().getId())
-                .get().getCreatedEvents().stream().filter(y -> y.getClientReservations().size() != 0);
-
-        reserv.forEach(x -> {
+        getBookings().forEach(x -> {
             x.getClientReservations().forEach(
                     a -> {
                         //Loop over MonthGroup keys
@@ -317,11 +347,7 @@ public class ReservationController extends BaseController {
             eventTypeGroup.put(a.getName(), 0);
         });
 
-        var reserv = userRepository.findById(getCurrentUser().getId())
-                .get().getCreatedEvents().stream().filter(y -> y.getClientReservations().size() != 0);
-
-
-        reserv.forEach(x -> {
+        getBookings().forEach(x -> {
             x.getClientReservations().forEach(
                     r -> {
                         for (String key : eventTypeGroup.keySet()) {

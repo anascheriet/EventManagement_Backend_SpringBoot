@@ -18,7 +18,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final String[] PUBLIC_ENDPOINTS = {
             "/auth/register",
             "/auth/login",
-
+            "/events/",
+            "/events/{id}"
     };
 
     @Bean

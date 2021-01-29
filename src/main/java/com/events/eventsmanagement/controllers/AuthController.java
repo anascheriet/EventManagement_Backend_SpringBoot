@@ -7,6 +7,7 @@ import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.repositories.UserRepository;
 import com.events.eventsmanagement.security.TokenUtil;
 import com.events.eventsmanagement.security.UserService;
+import com.events.eventsmanagement.util.EmailSenderImpl;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,6 +38,9 @@ public class AuthController extends BaseController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private EmailSenderImpl emailSender;
 
     @PostMapping("/register")
     public ResponseEntity<?> Register(@RequestBody AppUser appUser) {
@@ -81,12 +85,21 @@ public class AuthController extends BaseController {
         return ResponseEntity.ok(response);
     }
 
-   /* @PostMapping("/forgotPassword")
-    public ResponseEntity<?> forgotPassword(@RequestBody String email) {
-        var user = userRepository.findByEmail(email);
-        if (user != null) {
-
+    @PostMapping("/forgotPassword")
+    public ResponseEntity<?> forgotPassword(@RequestBody loginDto loginDto) {
+        var user = userRepository.findByEmail(loginDto.getUsername());
+        System.out.println(user);
+        if (user == null) {
+            return ResponseEntity.badRequest().body("There's no user with this email, try providing your accurate email");
         }
-    }*/
+        UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
+        String confirmationToken = tokenUtil.generateToken(userDetails);
 
+        var mailContent = "To complete the password reset process, please click here: "
+                + "http://localhost:3000/authentication/reset?token=" + confirmationToken + "&email=" + loginDto.getUsername();
+
+        emailSender.sendMail(user.getEmail(), "Reset Your Password", mailContent);
+
+        return ResponseEntity.ok("An email with a link has been sent to your mail address, please follow the link so you can reset your password");
+    }
 }

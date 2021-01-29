@@ -122,6 +122,7 @@ public class UserService implements UserDetailsService {
 
         user.setPassword(passwordEncoder().encode(resetDto.getPassword()));
         userRepository.save(user);
+
         return ResponseEntity.ok("Your Password Has been Updated! please Log in using your new Password");
     }
 

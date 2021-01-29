@@ -89,6 +89,7 @@ public class AuthController extends BaseController {
         if (user == null) {
             return ResponseEntity.badRequest().body("There's no user with this email, try providing your accurate email");
         }
+
         UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
         String confirmationToken = tokenUtil.generateToken(userDetails);
 
@@ -102,6 +103,6 @@ public class AuthController extends BaseController {
 
     @PostMapping("/resetPassword")
     public ResponseEntity<?> resetPassword(@RequestBody resetPasswordDto resetDto) {
-        return ResponseEntity.ok(userService.resetPassword(resetDto));
+        return userService.resetPassword(resetDto);
     }
 }

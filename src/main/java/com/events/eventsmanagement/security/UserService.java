@@ -1,6 +1,7 @@
 package com.events.eventsmanagement.security;
 
 import com.events.eventsmanagement.controllers.BaseController;
+import com.events.eventsmanagement.dto.resetPasswordDto;
 import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.repositories.RoleRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
@@ -22,6 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.validation.constraints.Null;
 import java.util.HashSet;
@@ -36,6 +38,10 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private TokenUtil tokenUtil;
+
 
     @Bean
     private PasswordEncoder passwordEncoder() {
@@ -90,6 +96,33 @@ public class UserService implements UserDetailsService {
 
 
         return ResponseEntity.ok(userRepository.save(user));
+    }
+
+    public ResponseEntity<?> resetPassword(@RequestBody resetPasswordDto resetDto) {
+        if (resetDto.getConfirmpassword() == null || resetDto.getPassword() == null || resetDto.getEmail() == null || resetDto.getConfirmationtoken() == null) {
+            return ResponseEntity.badRequest().body("Missing arguments, try again");
+        }
+
+
+        var mail = tokenUtil.extractClaims(resetDto.getConfirmationtoken().getToken()).getSubject();
+
+        if (!mail.equals(resetDto.getEmail())) {
+            return ResponseEntity.badRequest().body("Invalid Url, make sure the link you're using is the one that was sent to your mail adress");
+        }
+
+        if (!resetDto.getPassword().equals(resetDto.getConfirmpassword())) {
+            return ResponseEntity.badRequest().body("The two entered passwords do not match, try again");
+        }
+
+        var user = userRepository.findByEmail(resetDto.getEmail());
+
+        if (passwordEncoder().matches(resetDto.getPassword(), user.getPassword())) {
+            return ResponseEntity.badRequest().body("The entered password matches the old one, try entering a new one");
+        }
+
+        user.setPassword(passwordEncoder().encode(resetDto.getPassword()));
+        userRepository.save(user);
+        return ResponseEntity.ok("Your Password Has been Updated! please Log in using your new Password");
     }
 
 

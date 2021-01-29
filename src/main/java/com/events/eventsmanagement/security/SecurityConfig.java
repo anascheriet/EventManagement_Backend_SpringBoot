@@ -19,7 +19,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/auth/register",
             "/auth/login",
             "/events/",
-            "/events/{id}"
+            "/events/{id}",
+            "/auth/forgotPassword",
+            "/auth/resetPassword"
     };
 
     @Bean

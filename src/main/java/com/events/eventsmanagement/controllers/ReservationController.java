@@ -132,6 +132,7 @@ public class ReservationController extends BaseController {
                         : 0;
     }
 
+
     private Double extractLastIncome(ZonedDateTime afterDate, ZonedDateTime beforeDate) {
         return loggedUser().get().getRole().getName().equals("Admin") ? loggedUser().get().getCreatedEvents().stream()
                 .map(x -> x.getClientReservations().stream()

@@ -46,7 +46,7 @@ public class TokenUtil {
         return new Date(System.currentTimeMillis() + TOKEN_VALIDITY * 1000);
     }
 
-    private Claims extractClaims(String token) {
+    public Claims extractClaims(String token) {
         Claims claims;
         try {
             claims = Jwts.parser().

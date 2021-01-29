@@ -1,8 +1,6 @@
 package com.events.eventsmanagement.controllers;
 
-import com.events.eventsmanagement.dto.GetUserDto;
-import com.events.eventsmanagement.dto.JwtResponse;
-import com.events.eventsmanagement.dto.errorResponse;
+import com.events.eventsmanagement.dto.*;
 import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.repositories.UserRepository;
 import com.events.eventsmanagement.security.TokenUtil;
@@ -19,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import com.events.eventsmanagement.dto.loginDto;
 
 import java.util.Optional;
 
@@ -100,6 +97,11 @@ public class AuthController extends BaseController {
 
         emailSender.sendMail(user.getEmail(), "Reset Your Password", mailContent);
 
-        return ResponseEntity.ok("An email with a link has been sent to your mail address, please follow the link so you can reset your password");
+        return ResponseEntity.ok("An email with a link has been sent to your mail address, please follow the link so you can reset your password.");
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<?> resetPassword(@RequestBody resetPasswordDto resetDto) {
+        return ResponseEntity.ok(userService.resetPassword(resetDto));
     }
 }

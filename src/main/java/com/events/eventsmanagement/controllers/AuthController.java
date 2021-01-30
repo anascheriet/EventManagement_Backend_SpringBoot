@@ -59,10 +59,28 @@ public class AuthController extends BaseController {
                     .map(x -> x.getClientReservations().stream()
                             .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople())
                             .sum()).mapToDouble(s -> s).sum();
-            var admin = new adminDataDto(u.getEmail(), u.getDisplayName(), u.getAge(), u.getCountry(), u.getIsAccNonLocked(), revenue);
+            var admin = new adminDataDto(u.getId(), u.getEmail(), u.getDisplayName(), u.getAge(), u.getCountry(), u.getIsAccNonLocked(), revenue);
             adminData.add(admin);
         });
         return ResponseEntity.ok(adminData);
+    }
+
+    @GetMapping("/lockUnlockAdminAccount/{id}")
+    public ResponseEntity<?> lockUnlockAdminAccount(@PathVariable int id) {
+        var user = userRepository.findById(id);
+
+        user.map(u -> {
+                    u.setIsAccNonLocked(!u.getIsAccNonLocked());
+                    userRepository.save(u);
+                    return ResponseEntity.ok(u.getIsAccNonLocked());
+                }
+        );
+
+        String msg = user.get().getIsAccNonLocked() ?
+                user.get().getDisplayName() + "'s Account Has been unlocked !" :
+                user.get().getDisplayName() + "'s Account Has been locked !";
+
+        return ResponseEntity.ok(msg);
     }
 
     @GetMapping("/loggedInUser")

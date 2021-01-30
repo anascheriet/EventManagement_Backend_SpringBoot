@@ -24,6 +24,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/auth/resetPassword"
     };
 
+    private final String[] SuperAdmin_ENDPOINTS = {
+            "/auth/adminData",
+            " /lockUnlockAdminAccount/{id}"
+    };
+
     @Bean
     AuthFilter authFilter() {
         return new AuthFilter();
@@ -38,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(PUBLIC_ENDPOINTS).permitAll()
                 .regexMatchers("/([/|.|\\w|\\s|-])+\\.(?:jpg|jpeg|png)").permitAll()
-                .antMatchers("/auth/allUsers").hasAuthority("SuperAdmin")
+                .antMatchers(SuperAdmin_ENDPOINTS).hasAuthority("SuperAdmin")
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(authFilter(), UsernamePasswordAuthenticationFilter.class);

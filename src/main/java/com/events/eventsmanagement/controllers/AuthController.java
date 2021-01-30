@@ -19,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -46,10 +48,21 @@ public class AuthController extends BaseController {
         return ResponseEntity.ok(appUser.getAuthorities());
     }
 
-    @GetMapping("/allUsers")
-    public ResponseEntity<Iterable<AppUser>> getAllUsers() {
-        var users = userRepository.findAll();
-        return ResponseEntity.ok(users);
+    @GetMapping("/adminData")
+    public ResponseEntity<?> getAllAdmins() {
+        var bdAdmins = userRepository.findAll().stream().filter(u -> u.getRole().getId() == 2);
+        System.out.println("Admins --------------- " + bdAdmins);
+        List<adminDataDto> adminData = new ArrayList<>();
+
+        bdAdmins.forEach(u -> {
+            var revenue = u.getCreatedEvents().stream().filter(y -> !y.getClientReservations().isEmpty())
+                    .map(x -> x.getClientReservations().stream()
+                            .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople())
+                            .sum()).mapToDouble(s -> s).sum();
+            var admin = new adminDataDto(u.getEmail(), u.getDisplayName(), u.getAge(), u.getCountry(), u.getIsAccNonLocked(), revenue);
+            adminData.add(admin);
+        });
+        return ResponseEntity.ok(adminData);
     }
 
     @GetMapping("/loggedInUser")
@@ -65,8 +78,6 @@ public class AuthController extends BaseController {
 
     @PostMapping("/login")
     public ResponseEntity<?> LogIn(@RequestBody loginDto loginRequest) {
-
-
         try {
             final Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));

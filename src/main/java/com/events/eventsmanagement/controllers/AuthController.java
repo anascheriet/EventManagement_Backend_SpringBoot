@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -73,6 +74,9 @@ public class AuthController extends BaseController {
         } catch (BadCredentialsException e) {
             var err = new errorResponse("Bad Credentials, please make sure your email and password are correct");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
+        } catch (LockedException le) {
+            var err = new errorResponse("Your Account is locked, Please check with your supervisor");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(err);
         }
 
         UserDetails userDetails = userService.loadUserByUsername(loginRequest.getUsername());
@@ -89,7 +93,6 @@ public class AuthController extends BaseController {
         if (user == null) {
             return ResponseEntity.badRequest().body("There's no user with this email, try providing your accurate email");
         }
-
         UserDetails userDetails = userService.loadUserByUsername(user.getEmail());
         String confirmationToken = tokenUtil.generateToken(userDetails);
 

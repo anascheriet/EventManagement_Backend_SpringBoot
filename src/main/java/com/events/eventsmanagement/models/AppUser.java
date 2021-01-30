@@ -33,6 +33,8 @@ public class AppUser implements UserDetails {
     private String city;
     private int age;
     private String password;
+    private Boolean isAccNonLocked;
+
 
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL)
     @JsonManagedReference(value = "user-events")
@@ -70,7 +72,7 @@ public class AppUser implements UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return this.isAccNonLocked;
     }
 
     @Override
@@ -82,4 +84,6 @@ public class AppUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
 }

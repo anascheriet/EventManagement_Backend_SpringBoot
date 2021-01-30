@@ -85,6 +85,7 @@ public class UserService implements UserDetailsService {
         } else
 
             user.setPassword(passwordEncoder().encode(user.getPassword()));
+        user.setIsAccNonLocked(true);
 
         if (roleShouldBeSuperAdmin) {
             user.setRole(roleRepository.findRoleByName("SuperAdmin"));

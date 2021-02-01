@@ -44,9 +44,16 @@ public class AuthController extends BaseController {
 
     @PostMapping("/register")
     public ResponseEntity<?> Register(@RequestBody AppUser appUser) {
-        userService.createUser(appUser);
-        return ResponseEntity.ok(appUser.getAuthorities());
+        return ResponseEntity.ok(userService.createUser(appUser));
+
     }
+
+
+    /*@PostMapping("/addAdmin")
+    public ResponseEntity<?> addAdmin(@RequestBody AppUser admin) {
+        userService.createAdmin(admin);
+        return ResponseEntity.ok(admin.getAuthorities());
+    }*/
 
     @GetMapping("/adminData")
     public ResponseEntity<?> getAllAdmins() {

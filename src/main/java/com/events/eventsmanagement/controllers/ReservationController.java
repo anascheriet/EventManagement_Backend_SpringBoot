@@ -7,6 +7,8 @@ import com.events.eventsmanagement.models.Reservation;
 import com.events.eventsmanagement.repositories.EventRepository;
 import com.events.eventsmanagement.repositories.EventTypeRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
+import org.joda.time.Days;
+import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,10 +70,10 @@ public class ReservationController extends BaseController {
             var resDto = new reservationGetDto();
             resDto.setReservation(oneRes.get());
             resDto.setClientId(oneRes.get().getAppUser().getId());
-            resDto.setClientName(oneRes.get().getAppUser().getDisplayName());
             resDto.setEventId(oneRes.get().getEvent().getId());
             resDto.setEventName(oneRes.get().getEvent().getEventName());
             resDto.setImagePath(oneRes.get().getEvent().getImagePath());
+            resDto.setEventDate(oneRes.get().getEvent().getEventDate());
             var price = oneRes.get().getEvent().getTicketPrice() * oneRes.get().getNumOfPeople();
             resDto.setToPay(price);
 
@@ -84,7 +86,6 @@ public class ReservationController extends BaseController {
     public ResponseEntity<?> getAllReservations() {
         return ResponseEntity.ok(allBookings());
     }
-
 
     @GetMapping("/MyBookings")
     public ResponseEntity<?> getMyReservations() {
@@ -104,8 +105,8 @@ public class ReservationController extends BaseController {
 
         resDto.setReservation(oneRes.get());
         resDto.setClientId(oneRes.get().getAppUser().getId());
-        resDto.setClientName(oneRes.get().getAppUser().getDisplayName());
         resDto.setEventId(oneRes.get().getEvent().getId());
+        resDto.setEventDate(oneRes.get().getEvent().getEventDate());
         resDto.setEventName(oneRes.get().getEvent().getEventName());
 
         return ResponseEntity.ok(resDto);
@@ -126,11 +127,30 @@ public class ReservationController extends BaseController {
         return ResponseEntity.ok(req);
     }
 
+    @DeleteMapping("/CancelBooking/{id}")
+    public ResponseEntity<?> cancelBooking(@PathVariable int id) {
+        var booking = reservationRepository.findById(id);
+        LocalDate nowDate = LocalDate.now();
+        java.time.LocalDate tempDate = booking.get().getEvent().getEventDate().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        LocalDate eventDate = new LocalDate(tempDate.getYear(), tempDate.getMonthValue(), tempDate.getDayOfMonth());
+        long diff = Math.abs(Days.daysBetween(nowDate, eventDate).getDays());
+
+        //if theres less than 3 days to th event don't cancel
+        if (diff < 3) {
+            return ResponseEntity.badRequest().body("You can Only Cancel Bookings where there's more than 3days+ left to the event.");
+        }
+
+        //Update num of available tickets
+        var event = eventRepository.findById(booking.get().getEvent().getId());
+        event.get().setAvailableTickets(event.get().getAvailableTickets() + booking.get().getNumOfPeople());
+        reservationRepository.deleteById(id);
+
+        return ResponseEntity.ok("Booking Canceled.");
+    }
 
     private ZonedDateTime formatDate(Date d) {
         return d.toInstant().atZone(ZoneId.systemDefault());
     }
-
 
     private Optional<AppUser> loggedUser() {
         return userRepository.findById(getCurrentUser().getId());

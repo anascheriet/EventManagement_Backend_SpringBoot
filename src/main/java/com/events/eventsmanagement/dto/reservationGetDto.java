@@ -10,4 +10,6 @@ public class reservationGetDto {
     private String clientName;
     private int eventId;
     private String eventName;
+    private String imagePath;
+    private float toPay;
 }

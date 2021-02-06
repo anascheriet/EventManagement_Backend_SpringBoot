@@ -26,7 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final String[] SuperAdmin_ENDPOINTS = {
             "/auth/adminData",
-            " /lockUnlockAdminAccount/{id}"
+            "/lockUnlockAdminAccount/{id}"
     };
 
     @Bean

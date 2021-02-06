@@ -117,7 +117,7 @@ public class UserService implements UserDetailsService {
 
                 //send credentials to admin in mail
                 var mailContent = "You have been made an admin to use the eventor app." +
-                        " \n Here are the credentials you can use to log in: \n " +
+                        " \n Here are the credentials you can use to log in: \n" +
                         "Email: " + user.getEmail() + ".\n" +
                         "Password: " + generatedPassword;
 
@@ -126,6 +126,7 @@ public class UserService implements UserDetailsService {
                 msg = "Admin Added.";
             } else {
                 user.setRole(roleRepository.findRoleByName("Client"));
+                user.setPassword(passwordEncoder().encode(user.getPassword()));
                 msg = "Your Account Has been Created! Please Login";
             }
         }

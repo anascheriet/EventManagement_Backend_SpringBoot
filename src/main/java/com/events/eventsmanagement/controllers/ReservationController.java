@@ -42,6 +42,8 @@ public class ReservationController extends BaseController {
     public ResponseEntity<?> addReservation(@RequestBody reservationDto reservationDto) {
         var user = userRepository.findById(getCurrentUser().getId());
         var event = eventRepository.findById(reservationDto.getEventid());
+
+
         if (!user.isPresent()) {
             return ResponseEntity.badRequest().body("There's no user with the provided id, please make sure you are authenticated");
         }
@@ -57,8 +59,8 @@ public class ReservationController extends BaseController {
         return ResponseEntity.ok("Booking Made ! Your total to pay is $" + event.get().getTicketPrice() * reservationDto.getNumOfPeople() + "! Please check your Bookings list to see all of your bookings.");
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<reservationGetDto>> getAllReservations() {
+
+    public List<reservationGetDto> allBookings() {
         var reservations = reservationRepository.findAll();
         List<reservationGetDto> displayedReservations = new ArrayList<>();
         reservations.forEach(res -> {
@@ -69,11 +71,26 @@ public class ReservationController extends BaseController {
             resDto.setClientName(oneRes.get().getAppUser().getDisplayName());
             resDto.setEventId(oneRes.get().getEvent().getId());
             resDto.setEventName(oneRes.get().getEvent().getEventName());
+            resDto.setImagePath(oneRes.get().getEvent().getImagePath());
+            var price = oneRes.get().getEvent().getTicketPrice() * oneRes.get().getNumOfPeople();
+            resDto.setToPay(price);
 
             displayedReservations.add(resDto);
         });
+        return displayedReservations;
+    }
 
-        return ResponseEntity.ok(displayedReservations);
+    @GetMapping("/")
+    public ResponseEntity<?> getAllReservations() {
+        return ResponseEntity.ok(allBookings());
+    }
+
+
+    @GetMapping("/MyBookings")
+    public ResponseEntity<?> getMyReservations() {
+        var userId = userRepository.findById(getCurrentUser().getId()).get().getId();
+        var myBookings = allBookings().stream().filter(x -> x.getClientId() == userId);
+        return ResponseEntity.ok(myBookings);
     }
 
     @GetMapping("/{id}")

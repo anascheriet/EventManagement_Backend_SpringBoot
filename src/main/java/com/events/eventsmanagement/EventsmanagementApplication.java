@@ -1,16 +1,14 @@
 package com.events.eventsmanagement;
 
-import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.models.Role;
 import com.events.eventsmanagement.repositories.RoleRepository;
-import com.events.eventsmanagement.security.UserService;
+import com.events.eventsmanagement.Services.UserService;
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
 import java.util.Arrays;
 import java.util.List;

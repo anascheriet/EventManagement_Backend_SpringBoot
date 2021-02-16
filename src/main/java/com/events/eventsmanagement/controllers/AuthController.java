@@ -4,7 +4,7 @@ import com.events.eventsmanagement.dto.*;
 import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.repositories.UserRepository;
 import com.events.eventsmanagement.security.TokenUtil;
-import com.events.eventsmanagement.security.UserService;
+import com.events.eventsmanagement.Services.UserService;
 import com.events.eventsmanagement.util.EmailSenderImpl;
 import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;

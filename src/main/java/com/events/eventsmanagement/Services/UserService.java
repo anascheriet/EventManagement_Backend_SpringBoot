@@ -1,10 +1,11 @@
-package com.events.eventsmanagement.security;
+package com.events.eventsmanagement.Services;
 
 import com.events.eventsmanagement.controllers.BaseController;
 import com.events.eventsmanagement.dto.resetPasswordDto;
 import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.repositories.RoleRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
+import com.events.eventsmanagement.security.TokenUtil;
 import com.events.eventsmanagement.util.EmailSenderImpl;
 import javassist.NotFoundException;
 import lombok.SneakyThrows;

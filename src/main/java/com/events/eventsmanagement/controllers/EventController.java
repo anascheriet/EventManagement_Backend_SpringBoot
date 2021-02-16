@@ -76,7 +76,7 @@ public class EventController extends BaseController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<eventDto> patchEvent(@PathVariable int id, @RequestBody eventDto req) {
+    public ResponseEntity<?> patchEvent(@PathVariable int id, @RequestBody eventDto req) {
         var foundEvent = eventRepository.findById(id);
         foundEvent.map(ev -> {
             if (req.getEventDate() != null) {
@@ -92,7 +92,17 @@ public class EventController extends BaseController {
             return ResponseEntity.ok(eventRepository.save(ev));
         }).orElse(null);
 
-        return ResponseEntity.ok(req);
+        return ResponseEntity.ok("Event Updated !");
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteEvent(@PathVariable int id) {
+        var event = eventRepository.findById(id);
+        if (event.get().getClientReservations().size() > 0) {
+            return ResponseEntity.badRequest().body("You can't delete this event, it has been booked by clients");
+        } else
+            eventRepository.deleteById(id);
+        return ResponseEntity.ok("Event Deleted");
     }
 
     @PostMapping("/image")
@@ -100,7 +110,6 @@ public class EventController extends BaseController {
         System.out.println((file));
         return fileUploadService.singleFileUpload(file);
     }
-
 
 
 }

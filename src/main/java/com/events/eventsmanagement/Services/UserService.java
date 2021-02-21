@@ -2,6 +2,8 @@ package com.events.eventsmanagement.Services;
 
 import com.events.eventsmanagement.controllers.BaseController;
 import com.events.eventsmanagement.dto.resetPasswordDto;
+import com.events.eventsmanagement.dto.updatePasswordDto;
+import com.events.eventsmanagement.dto.updateUserDto;
 import com.events.eventsmanagement.models.AppUser;
 import com.events.eventsmanagement.repositories.RoleRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
@@ -49,7 +51,6 @@ public class UserService implements UserDetailsService {
     @Autowired
     private EmailSenderImpl emailSender;
 
-
     @Bean
     private PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -95,7 +96,6 @@ public class UserService implements UserDetailsService {
 
         /* var userNameExists = userRepository.findByDisplayname(user.getDisplayName());*/
 
-
         if (EmailExists != null) {
             return ResponseEntity.badRequest().body("The provided email already exists, try providing another one");
       /*  } else if (userNameExists != null) {
@@ -137,36 +137,10 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.ok(msg);
     }
 
-
-    /*public ResponseEntity<?> createAdmin(AppUser admin) {
-        var EmailExists = userRepository.findByEmail(admin.getEmail());
-
-        *//*    var userNameExists = userRepository.findByDisplayname(admin.getDisplayName());*//*
-
-        if (EmailExists != null) {
-            return ResponseEntity.badRequest().body("The provided email already exists, try providing another one");
-     *//*   } else if (userNameExists != null) {
-            return ResponseEntity.badRequest().body("The provided username already exists, try providing another one");
-       *//*
-        } else {
-            //generate Random Password
-            byte[] array = new byte[7]; // length is bounded by 7
-            new Random().nextBytes(array);
-            String generatedPassword = new String(array, Charset.forName("UTF-8"));
-
-            admin.setPassword(passwordEncoder().encode(generatedPassword));
-            admin.setIsAccNonLocked(true);
-            admin.setRole(roleRepository.findRoleByName("Admin"));
-        }
-
-        return ResponseEntity.ok(userRepository.save(admin));
-    }*/
-
     public ResponseEntity<?> resetPassword(@RequestBody resetPasswordDto resetDto) {
         if (resetDto.getConfirmpassword() == null || resetDto.getPassword() == null || resetDto.getEmail() == null || resetDto.getConfirmationtoken() == null) {
             return ResponseEntity.badRequest().body("Missing arguments, try again");
         }
-
 
         var mail = tokenUtil.extractClaims(resetDto.getConfirmationtoken().getToken()).getSubject();
 
@@ -190,5 +164,41 @@ public class UserService implements UserDetailsService {
         return ResponseEntity.ok("Your Password Has been Updated! please Log in using your new Password");
     }
 
+    public ResponseEntity<?> updateUserInfo(updateUserDto updateDto) {
+        var user = userRepository.findById(getCurrentUser().getId());
+        //check if email exists
+        var emailExists = userRepository.findByEmail(updateDto.getEmail()) != null;
+
+        //check if user is keeping his email
+        var sameEmail = user.get().getEmail().equals(updateDto.getEmail());
+
+        if (emailExists && !sameEmail) {
+            return ResponseEntity.badRequest().body("Email already exists, try another one.");
+        } else if (updateDto.getDisplayName().equals(null) || updateDto.getEmail().equals(null) || updateDto.getCountry().equals(null)) {
+            return ResponseEntity.badRequest().body("Please fill all the fields before submitting");
+        } else {
+            user.map(u -> {
+                u.setEmail(updateDto.getEmail());
+                u.setCountry(updateDto.getCountry());
+                u.setGender(updateDto.getGender());
+                u.setDisplayName(updateDto.getDisplayName());
+                return ResponseEntity.ok(userRepository.save(u));
+            });
+        }
+        return ResponseEntity.ok("Your profile has been updated !");
+    }
+
+    public ResponseEntity<?> updatePassword(updatePasswordDto updatePassDto) {
+        var user = userRepository.findById(getCurrentUser().getId());
+
+        if (!updatePassDto.getPassword().equals(updatePassDto.getConfirmPassword())) {
+            return ResponseEntity.badRequest().body("The Two passwords Should Match");
+        } else
+            user.map(u -> {
+                u.setPassword(passwordEncoder().encode(updatePassDto.getPassword()));
+                return ResponseEntity.ok(userRepository.save(u));
+            });
+        return ResponseEntity.ok("Your Password has been updated , please Re-Log in");
+    }
 
 }

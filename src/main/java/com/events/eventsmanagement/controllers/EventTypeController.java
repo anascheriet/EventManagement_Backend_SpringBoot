@@ -20,9 +20,9 @@ public class EventTypeController extends BaseController {
     private EventRepository eventRepository;
 
     @PostMapping("/create")
-    public ResponseEntity<EventType> addEventType(@RequestBody EventType eventType) {
+    public ResponseEntity<?> addEventType(@RequestBody EventType eventType) {
         var eType = eventTypeRepository.save(eventType);
-        return ResponseEntity.ok(eType);
+        return ResponseEntity.ok("Event type added !");
     }
 
     @GetMapping("/")
@@ -38,10 +38,11 @@ public class EventTypeController extends BaseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EventType> updateEvType(@PathVariable int id, @RequestBody EventType req) {
+    public ResponseEntity<?> updateEvType(@PathVariable int id, @RequestBody EventType req) {
         var foundType = eventTypeRepository.findById(id);
         req.setId(foundType.get().getId());
-        return ResponseEntity.ok(eventTypeRepository.save(req));
+        eventTypeRepository.save(req);
+        return ResponseEntity.ok("Event type updated !");
     }
 
     @DeleteMapping("/{id}")

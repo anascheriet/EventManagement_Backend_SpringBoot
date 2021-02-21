@@ -40,7 +40,7 @@ public class EventController extends BaseController {
     private fileUploadService fileUploadService;
 
     @PostMapping("/create")
-    public ResponseEntity<eventDto> addEvent(@RequestBody eventDto eventDto) throws IOException {
+    public ResponseEntity<?> addEvent(@RequestBody eventDto eventDto) throws IOException {
         var user = userRepository.findById(getCurrentUser().getId());
         var eventType = eventTypeRepository.findById(eventDto.getEventtypeid());
 
@@ -52,7 +52,7 @@ public class EventController extends BaseController {
         Event createdEvent = new Event(eventDto.getEventName(), eventType.get(), eventDto.getCountry(), eventDto.getCity(), eventDto.getDescription(),
                 eventDto.getEventDate(), eventDto.getTicketprice(), eventDto.getAvailabletickets(), user.get(), eventDto.getImage());
         eventRepository.save(createdEvent);
-        return ResponseEntity.ok(eventDto);
+        return ResponseEntity.ok("Event added successfully !");
     }
 
     @GetMapping("/")
@@ -102,7 +102,7 @@ public class EventController extends BaseController {
             return ResponseEntity.badRequest().body("You can't delete this event, it has been booked by clients");
         } else
             eventRepository.deleteById(id);
-        return ResponseEntity.ok("Event Deleted");
+        return ResponseEntity.ok("Event Deleted !");
     }
 
     @PostMapping("/image")

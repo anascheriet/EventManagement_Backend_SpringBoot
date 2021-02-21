@@ -48,7 +48,6 @@ public class AuthController extends BaseController {
 
     }
 
-
     /*@PostMapping("/addAdmin")
     public ResponseEntity<?> addAdmin(@RequestBody AppUser admin) {
         userService.createAdmin(admin);
@@ -144,4 +143,15 @@ public class AuthController extends BaseController {
     public ResponseEntity<?> resetPassword(@RequestBody resetPasswordDto resetDto) {
         return userService.resetPassword(resetDto);
     }
+
+    @PatchMapping("/updateProfile")
+    public ResponseEntity<?> updateProfile(@RequestBody updateUserDto userDto) {
+        return userService.updateUserInfo(userDto);
+    }
+
+    @PatchMapping("/updatePassword")
+    public ResponseEntity<?> updatePassword(@RequestBody updatePasswordDto updatePasswordDto) {
+        return userService.updatePassword(updatePasswordDto);
+    }
+
 }

@@ -200,8 +200,6 @@ public class StatsService extends BaseController {
                         var localBirthDate = LocalDate.parse(x.getAppUser().getBirthDate().toString().split(" ")[0]);
                         var age = Period.between(localBirthDate,LocalDate.now()).getYears();
 
-                        System.out.println(age);
-
                         if (age >= 18 && age <= 29) {
                             int count = ageGroup.get("18 to 29");
                             ageGroup.put("18 to 29", count + 1);

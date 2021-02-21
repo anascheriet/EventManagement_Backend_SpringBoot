@@ -19,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -61,11 +63,13 @@ public class AuthController extends BaseController {
         List<adminDataDto> adminData = new ArrayList<>();
 
         bdAdmins.forEach(u -> {
+            var localBirthDate = LocalDate.parse(u.getBirthDate().toString().split(" ")[0]);
+            var age = Period.between(localBirthDate, LocalDate.now()).getYears();
             var revenue = u.getCreatedEvents().stream().filter(y -> !y.getClientReservations().isEmpty())
                     .map(x -> x.getClientReservations().stream()
                             .mapToDouble(a -> a.getEvent().getTicketPrice() * a.getNumOfPeople())
                             .sum()).mapToDouble(s -> s).sum();
-            var admin = new adminDataDto(u.getId(), u.getEmail(), u.getDisplayName(), u.getAge(), u.getCountry(), u.getIsAccNonLocked(), revenue);
+            var admin = new adminDataDto(u.getId(), u.getEmail(), u.getDisplayName(), age, u.getCountry(), u.getIsAccNonLocked(), revenue);
             adminData.add(admin);
         });
         return ResponseEntity.ok(adminData);

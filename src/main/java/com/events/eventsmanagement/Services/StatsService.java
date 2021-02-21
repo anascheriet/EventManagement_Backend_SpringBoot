@@ -8,11 +8,11 @@ import com.events.eventsmanagement.repositories.EventRepository;
 import com.events.eventsmanagement.repositories.EventTypeRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
 import lombok.var;
+import org.joda.time.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.DayOfWeek;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -197,17 +197,21 @@ public class StatsService extends BaseController {
         getBookings().forEach(a -> {
             a.getClientReservations().forEach(
                     x -> {
-                        System.out.println(x.getAppUser().getDisplayName());
-                        if (x.getAppUser().getAge() >= 18 && x.getAppUser().getAge() <= 29) {
+                        var localBirthDate = LocalDate.parse(x.getAppUser().getBirthDate().toString().split(" ")[0]);
+                        var age = Period.between(localBirthDate,LocalDate.now()).getYears();
+
+                        System.out.println(age);
+
+                        if (age >= 18 && age <= 29) {
                             int count = ageGroup.get("18 to 29");
                             ageGroup.put("18 to 29", count + 1);
-                        } else if (x.getAppUser().getAge() >= 30 && x.getAppUser().getAge() <= 39) {
+                        } else if (age >= 30 && age <= 39) {
                             int count = ageGroup.get("30 to 39");
                             ageGroup.put("30 to 39", count + 1);
-                        } else if (x.getAppUser().getAge() >= 40 && x.getAppUser().getAge() <= 65) {
+                        } else if (age >= 40 && age <= 65) {
                             int count = ageGroup.get("40 to 65");
                             ageGroup.put("40 to 65", count + 1);
-                        } else if (x.getAppUser().getAge() > 66) {
+                        } else if (age > 66) {
                             int count = ageGroup.get("Above 66");
                             ageGroup.put("Above 66", count + 1);
                         }

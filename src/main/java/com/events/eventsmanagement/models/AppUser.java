@@ -32,6 +32,7 @@ public class AppUser implements UserDetails {
     private String country;
     private String city;
     private int age;
+    private Date birthDate;
     private String password;
     private Boolean isAccNonLocked;
 

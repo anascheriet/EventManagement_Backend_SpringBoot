@@ -1,32 +1,41 @@
 package com.events.eventsmanagement.models;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.*;
-import java.util.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
 @Entity
 @Setter
 @Getter
+@AllArgsConstructor
 public class AppUser implements UserDetails {
 
     @Id
     @GeneratedValue
     private int id;
     private String displayName;
-    /*@NotEmpty*/
+    /* @NotEmpty */
     private String email;
     private String gender;
     private String country;
@@ -35,7 +44,6 @@ public class AppUser implements UserDetails {
     private Date birthDate;
     private String password;
     private Boolean isAccNonLocked;
-
 
     @OneToMany(mappedBy = "appUser", cascade = CascadeType.ALL)
     @JsonManagedReference(value = "user-events")
@@ -48,6 +56,15 @@ public class AppUser implements UserDetails {
     @OneToOne
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
+
+    public AppUser(String name, String mail, String gender, String country, int age, String password) {
+        this.displayName = name;
+        this.email = mail;
+        this.gender = gender;
+        this.age = age;
+        this.country = country;
+        this.password = password;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -85,6 +102,5 @@ public class AppUser implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
 
 }

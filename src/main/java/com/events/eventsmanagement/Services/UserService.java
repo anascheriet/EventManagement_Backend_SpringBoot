@@ -1,6 +1,21 @@
 package com.events.eventsmanagement.Services;
 
-import com.events.eventsmanagement.controllers.BaseController;
+import java.nio.charset.Charset;
+import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import com.events.eventsmanagement.dto.resetPasswordDto;
 import com.events.eventsmanagement.dto.updatePasswordDto;
 import com.events.eventsmanagement.dto.updateUserDto;
@@ -9,32 +24,8 @@ import com.events.eventsmanagement.repositories.RoleRepository;
 import com.events.eventsmanagement.repositories.UserRepository;
 import com.events.eventsmanagement.security.TokenUtil;
 import com.events.eventsmanagement.util.EmailSenderImpl;
-import javassist.NotFoundException;
-import lombok.SneakyThrows;
-import lombok.var;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.validation.constraints.Null;
-import java.nio.charset.Charset;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import lombok.var;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -65,7 +56,7 @@ public class UserService implements UserDetailsService {
             return user;
     }
 
-    private long getUsersCount() {
+    public long getUsersCount() {
         return userRepository.count();
     }
 

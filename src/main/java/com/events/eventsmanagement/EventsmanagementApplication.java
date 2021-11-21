@@ -1,8 +1,8 @@
 package com.events.eventsmanagement;
 
-import com.events.eventsmanagement.models.Role;
-import com.events.eventsmanagement.repositories.RoleRepository;
-import com.events.eventsmanagement.Services.UserService;
+import java.util.Arrays;
+import java.util.List;
+
 import org.apache.juli.logging.Log;
 import org.apache.juli.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +10,10 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.Arrays;
-import java.util.List;
+import com.events.eventsmanagement.Services.UserService;
+import com.events.eventsmanagement.models.AppUser;
+import com.events.eventsmanagement.models.Role;
+import com.events.eventsmanagement.repositories.RoleRepository;
 
 //@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
 @SpringBootApplication
@@ -42,11 +44,11 @@ public class EventsmanagementApplication implements CommandLineRunner {
             roleRepository.saveAll(roles);
         }
 
-       /* if (userService.getUsersCount() == 0) {
+        if (userService.getUsersCount() == 0) {
             logger.info("No user accounts Found, Creating some Users");
-            AppUser user = new AppUser("anas", "anas@live.fr", "male", "Moroccan", 22, "anas");
+            AppUser user = new AppUser("anas", "anas@live.fr", "male", "Moroccan", 22, "anas123");
             userService.createUser(user);
-        }*/
+        }
 
 
     }

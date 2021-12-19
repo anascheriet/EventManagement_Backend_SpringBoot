@@ -1,6 +1,7 @@
 package com.events.eventsmanagement.dto;
 
 import com.events.eventsmanagement.models.Event;
+
 import lombok.Data;
 
 @Data

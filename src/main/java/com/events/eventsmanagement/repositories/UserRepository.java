@@ -1,8 +1,8 @@
 package com.events.eventsmanagement.repositories;
 
-import com.events.eventsmanagement.models.AppUser;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
+
+import com.events.eventsmanagement.models.AppUser;
 
 public interface UserRepository extends JpaRepository<AppUser, Integer> {
 

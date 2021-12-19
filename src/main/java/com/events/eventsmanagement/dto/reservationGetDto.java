@@ -1,9 +1,10 @@
 package com.events.eventsmanagement.dto;
 
-import com.events.eventsmanagement.models.Reservation;
-import lombok.Data;
-
 import java.util.Date;
+
+import com.events.eventsmanagement.models.Reservation;
+
+import lombok.Data;
 
 @Data
 public class reservationGetDto {

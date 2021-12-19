@@ -1,19 +1,18 @@
 package com.events.eventsmanagement.util;
 
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 @Service
 public class fileUploadService {
 
     //Save the uploaded file to this folder
-    private static String UPLOAD_FOLDER = "/Users/anascheriet/Documents/Projects/Spring Boot/EventsManagement/src/main/resources/public/";
+    private static String UPLOAD_FOLDER = "/Users/anascheriet/Desktop/EVENTOR/api/EventManagement_Backend_SpringBoot/src/main/resources/public/";
 
     public String singleFileUpload(MultipartFile file) {
         if (file.isEmpty()) {

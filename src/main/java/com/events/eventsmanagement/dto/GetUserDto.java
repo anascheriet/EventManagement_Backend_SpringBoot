@@ -1,6 +1,7 @@
 package com.events.eventsmanagement.dto;
 
 import com.events.eventsmanagement.models.AppUser;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

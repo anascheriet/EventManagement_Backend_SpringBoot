@@ -1,8 +1,8 @@
 package com.events.eventsmanagement.repositories;
 
-import com.events.eventsmanagement.models.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
+
+import com.events.eventsmanagement.models.Event;
 
 public interface EventRepository extends JpaRepository<Event, Integer> {
 }

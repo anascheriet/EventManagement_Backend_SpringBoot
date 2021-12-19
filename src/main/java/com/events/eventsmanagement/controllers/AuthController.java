@@ -1,12 +1,11 @@
 package com.events.eventsmanagement.controllers;
 
-import com.events.eventsmanagement.dto.*;
-import com.events.eventsmanagement.models.AppUser;
-import com.events.eventsmanagement.repositories.UserRepository;
-import com.events.eventsmanagement.security.TokenUtil;
-import com.events.eventsmanagement.Services.UserService;
-import com.events.eventsmanagement.util.EmailSenderImpl;
-import lombok.var;
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +16,29 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.time.Period;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import com.events.eventsmanagement.dto.JwtResponse;
+import com.events.eventsmanagement.dto.adminDataDto;
+import com.events.eventsmanagement.dto.errorResponse;
+import com.events.eventsmanagement.dto.loginDto;
+import com.events.eventsmanagement.dto.resetPasswordDto;
+import com.events.eventsmanagement.dto.updatePasswordDto;
+import com.events.eventsmanagement.dto.updateUserDto;
+import com.events.eventsmanagement.models.AppUser;
+import com.events.eventsmanagement.repositories.UserRepository;
+import com.events.eventsmanagement.security.TokenUtil;
+import com.events.eventsmanagement.services.UserService;
+import com.events.eventsmanagement.util.EmailSenderImpl;
+
+import lombok.var;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:3000")
